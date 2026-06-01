@@ -100,7 +100,8 @@
               ariaTable: 'לוח הכפל',
               times: 'כפול',
               equals: 'שווה',
-              repeatedPrefix: 'חיבור חוזר:',
+              repeatedPrefix: 'קבוצות שוות:',
+              groupsWord: 'קבוצות של',
               mirrorPrefix: 'חוק החילוף:',
               cluePrefix: 'רמז:',
               clues: {
@@ -123,7 +124,8 @@
               ariaTable: 'Multiplication table',
               times: 'times',
               equals: 'equals',
-              repeatedPrefix: 'Repeated addition:',
+              repeatedPrefix: 'Equal groups:',
+              groupsWord: 'groups of',
               mirrorPrefix: 'Commutative fact:',
               cluePrefix: 'Clue:',
               clues: {
@@ -222,7 +224,9 @@
             var t = strings[lang];
             var parts = [];
             for(var i=0;i<selectedB;i++)parts.push(selectedA);
-            var repeated = parts.join(' + ') + ' = ' + product;
+            var repeated = lang === 'he'
+              ? selectedB + ' ' + t.groupsWord + ' ' + selectedA + ': ' + parts.join(' + ') + ' = ' + product
+              : selectedB + ' ' + t.groupsWord + ' ' + selectedA + ': ' + parts.join(' + ') + ' = ' + product;
             var mirror = expression(selectedB, selectedA);
 
             document.getElementById('equation').innerHTML =

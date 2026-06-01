@@ -27,7 +27,7 @@ Each multiplication fact should be explainable in several ways:
 
 - Table lookup: row by column.
 - Array: groups arranged visually.
-- Repeated addition: same group added repeatedly.
+- Equal groups: the same group size shown several times, for example 4 groups of 3.
 - Commutative fact: `a × b` equals `b × a`.
 - Pattern: clue based on the factor.
 
