@@ -41,6 +41,49 @@ body {
   min-width: 320px;
 }
 
+.recovery-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--surface-strong);
+  color: var(--ink);
+}
+
+.recovery-screen section {
+  max-inline-size: 560px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.recovery-screen p:first-child {
+  margin-block-end: 8px;
+  color: var(--teal);
+  font-weight: 850;
+}
+
+.recovery-screen h1 {
+  margin-block-end: 12px;
+}
+
+.recovery-screen p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.recovery-screen button {
+  min-block-size: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ink);
+  color: white;
+  padding: 10px 16px;
+  font-weight: 850;
+}
+
 button,
 a {
   font: inherit;

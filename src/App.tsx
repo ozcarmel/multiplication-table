@@ -259,7 +259,18 @@ function makeQuestion(tables: readonly number[]) {
 function loadProgress(): Progress {
   try {
     const saved = localStorage.getItem('multiplication-progress');
-    return saved ? { ...defaultProgress, ...JSON.parse(saved) } : defaultProgress;
+    if (!saved) return defaultProgress;
+
+    const parsed = JSON.parse(saved) as Partial<Progress>;
+    return {
+      explored: Array.isArray(parsed.explored) ? parsed.explored.filter((item) => typeof item === 'string') : [],
+      attempts: typeof parsed.attempts === 'number' ? parsed.attempts : 0,
+      correct: typeof parsed.correct === 'number' ? parsed.correct : 0,
+      streak: typeof parsed.streak === 'number' ? parsed.streak : 0,
+      bestStreak: typeof parsed.bestStreak === 'number' ? parsed.bestStreak : 0,
+      huntHits: typeof parsed.huntHits === 'number' ? parsed.huntHits : 0,
+      badges: Array.isArray(parsed.badges) ? parsed.badges.filter((item) => typeof item === 'string') : [],
+    };
   } catch {
     return defaultProgress;
   }
