@@ -73,6 +73,8 @@
         .practice-item:last-child{border-bottom:0;padding-bottom:0}
         .practice-answer{width:72px;min-height:36px;border:1px solid #c9dbe8;border-radius:8px;padding:6px 8px;text-align:center;font:inherit;font-weight:800;color:#14324a}
         .practice-check{min-width:38px;min-height:36px;border:0;border-radius:8px;background:#087f8c;color:white;font-size:18px;font-weight:900;cursor:pointer}
+        .practice-check svg{display:block;margin:auto}
+        .practice-check.hidden{visibility:hidden;pointer-events:none}
         .practice-result{font-size:24px;font-weight:900;line-height:1;text-align:center}
         .practice-result.correct{color:#1b8a4a}
         .practice-result.wrong{color:#c94736}
@@ -443,8 +445,8 @@
               line.className = 'practice-item';
               line.innerHTML =
                 '<label for="' + inputId + '">' + selectedPractice + ' x ' + multiplier + ' =</label>' +
-                '<input class="practice-answer" id="' + inputId + '" type="number" inputmode="numeric" aria-label="' + escapeHtml(t.answerLabel + ': ' + selectedPractice + ' x ' + multiplier) + '" />' +
-                '<button class="practice-check" type="button" aria-label="' + escapeHtml(t.checkAnswer + ': ' + selectedPractice + ' x ' + multiplier) + '">✓</button>' +
+                '<input class="practice-answer" id="' + inputId + '" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="' + escapeHtml(t.answerLabel + ': ' + selectedPractice + ' x ' + multiplier) + '" />' +
+                '<button class="practice-check hidden" type="button" aria-label="' + escapeHtml(t.checkAnswer + ': ' + selectedPractice + ' x ' + multiplier) + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="3"></circle><path d="M16.5 16.5 21 21" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path></svg></button>' +
                 '<span class="practice-result" aria-live="polite"></span>';
               var input = line.querySelector('.practice-answer');
               var checkButton = line.querySelector('.practice-check');
@@ -456,6 +458,12 @@
                 result.className = 'practice-result ' + (isCorrect ? 'correct' : 'wrong');
                 result.setAttribute('aria-label', isCorrect ? t.correct : t.wrong);
               }
+              input.oninput = function(){
+                checkButton.classList[input.value.trim() ? 'remove' : 'add']('hidden');
+                result.textContent = '';
+                result.className = 'practice-result';
+                result.removeAttribute('aria-label');
+              };
               checkButton.onclick = check;
               input.onkeydown = function(event){
                 if(event.key === 'Enter') check();
