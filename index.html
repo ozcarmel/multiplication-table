@@ -52,11 +52,14 @@
         .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
         .name-card{display:grid;gap:10px}
         .name-card.saved label,.name-card.saved .name-row{display:none}
+        .name-card:not(.saved) .change-name-button{display:none}
         .name-card label{font-weight:800}
         .name-row{display:flex;gap:8px;align-items:center}
         .app[dir="rtl"] .name-row{flex-direction:row-reverse}
         .name-row input{min-height:44px;min-width:0;flex:1;border:1px solid #c9dbe8;border-radius:8px;padding:10px 12px;font:inherit;color:#14324a;text-align:inherit;direction:inherit}
         .name-row button{min-height:44px;border:0;border-radius:8px;background:#087f8c;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
+        .change-name-button{justify-self:start;min-height:36px;border:1px solid #c9dbe8;border-radius:8px;background:white;color:#14324a;padding:7px 10px;font-weight:800;cursor:pointer}
+        .app[dir="rtl"] .change-name-button{justify-self:end}
         .greeting{margin:0;color:#087f8c;font-size:20px;font-weight:900;line-height:1.4}
         .greeting:empty{display:none}
         .practice-panel{display:grid;gap:14px;justify-items:center;text-align:center;background:#fffdf7;border-color:#f6c945}
@@ -157,6 +160,7 @@
                     <input id="childName" name="childName" autocomplete="given-name" />
                     <button type="button" id="saveNameButton">שמירה</button>
                   </div>
+                  <button type="button" class="change-name-button" id="changeNameButton">שנה שם</button>
                 </section>
                 <div class="equation" id="equation"></div>
                 <div class="insight-lines" id="insight"></div>
@@ -207,6 +211,7 @@
               nameLabel: 'איך קוראים לך?',
               namePlaceholder: 'השם שלך',
               saveName: 'שמירה',
+              changeName: 'שנה שם',
               greeting: 'שלום {name}!',
               noNameGreeting: 'שלום!',
               practiceTitle: 'תרגול',
@@ -245,6 +250,7 @@
               nameLabel: 'What is your name?',
               namePlaceholder: 'Your name',
               saveName: 'Save',
+              changeName: 'Change name',
               greeting: 'Hello {name}!',
               noNameGreeting: 'Hello!',
               practiceTitle: 'Practice',
@@ -313,6 +319,7 @@
             document.getElementById('nameLabel').textContent = t.nameLabel;
             document.getElementById('childName').placeholder = t.namePlaceholder;
             document.getElementById('saveNameButton').textContent = t.saveName;
+            document.getElementById('changeNameButton').textContent = t.changeName;
             document.getElementById('practiceTitle').textContent = t.practiceTitle;
             document.getElementById('orderedMode').textContent = t.ordered;
             document.getElementById('mixedMode').textContent = t.mixed;
@@ -363,6 +370,18 @@
             updateGreeting();
             showTemporaryGreeting();
             updateInsight();
+          }
+
+          function changeName(){
+            childName = '';
+            if(greetingTimer) window.clearTimeout(greetingTimer);
+            try {
+              localStorage.removeItem('multiplication-child-name');
+            } catch (error) {}
+            document.getElementById('greeting').textContent = '';
+            updateGreeting();
+            updateInsight();
+            document.getElementById('childName').focus();
           }
 
           function draw(){
@@ -581,6 +600,7 @@
 
           document.getElementById('printButton').onclick = function(){ window.print(); };
           document.getElementById('saveNameButton').onclick = saveName;
+          document.getElementById('changeNameButton').onclick = changeName;
           document.getElementById('childName').onkeydown = function(event){
             if(event.key === 'Enter') saveName();
           };
