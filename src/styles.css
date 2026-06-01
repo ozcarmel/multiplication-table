@@ -41,6 +41,14 @@ body {
   min-width: 320px;
 }
 
+.app[dir="rtl"] {
+  text-align: right;
+}
+
+.app[dir="ltr"] {
+  text-align: left;
+}
+
 .recovery-screen {
   min-height: 100vh;
   display: grid;
@@ -327,6 +335,9 @@ h4 {
   color: var(--muted);
   font-size: 1.12rem;
   line-height: 1.55;
+  direction: inherit;
+  text-align: inherit;
+  unicode-bidi: plaintext;
 }
 
 .stat-strip {
@@ -545,6 +556,9 @@ h4 {
   gap: 3px;
   color: var(--muted);
   line-height: 1.4;
+  direction: inherit;
+  text-align: inherit;
+  unicode-bidi: plaintext;
 }
 
 .insight-list strong {
@@ -631,6 +645,9 @@ h4 {
   font-weight: 800;
   background: #edf4fa;
   color: var(--muted);
+  direction: inherit;
+  text-align: inherit;
+  unicode-bidi: plaintext;
 }
 
 .feedback.good {
@@ -763,6 +780,9 @@ h4 {
 .parent-copy p {
   color: var(--muted);
   line-height: 1.6;
+  direction: inherit;
+  text-align: inherit;
+  unicode-bidi: plaintext;
 }
 
 .tips-list {

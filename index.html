@@ -5,121 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="לוח כפל אינטראקטיבי בעברית ובאנגלית עם משחקים, תרגול, תגי הצלחה ולוח להדפסה."
+      content="לוח כפל אינטראקטיבי בעברית ובאנגלית עם תרגול חזותי לילדים."
     />
-    <title>לוח הכפל | Multiplication Table</title>
+    <title>לוח הכפל בקלות | Multiplication Made Easy</title>
   </head>
   <body>
-    <div id="root">
-      <main class="static-app" dir="rtl" lang="he">
-        <style>
-          .static-app{min-height:100vh;padding:24px;font-family:Arial,sans-serif;color:#14324a;background:#f6fbff}
-          .static-shell{max-width:1180px;margin:0 auto;display:grid;gap:18px}
-          .static-hero{display:flex;align-items:end;justify-content:space-between;gap:16px}
-          .static-hero h1{margin:0;font-size:48px;line-height:1}
-          .static-hero p{margin:10px 0 0;color:#53677a;font-size:18px}
-          .static-panel{background:white;border:1px solid #c9dbe8;border-radius:8px;padding:18px;box-shadow:0 18px 45px rgba(20,50,74,.12)}
-          .static-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px}
-          .static-table-wrap{direction:ltr;overflow:auto}
-          .static-table{display:grid;grid-template-columns:repeat(11,56px);gap:5px;min-width:670px}
-          .static-cell,.static-axis,.static-corner{min-height:48px;border-radius:7px;display:grid;place-items:center;font-weight:800}
-          .static-axis,.static-corner{background:#14324a;color:white}
-          .static-cell{border:1px solid #d4e2ec;background:white;color:#14324a;cursor:pointer}
-          .static-cell:hover,.static-cell.active{background:#d9f3f0;border-color:#087f8c}
-          .static-cell.selected{background:#ff6b5a;color:white;border-color:#c94736}
-          .static-cell.mirror{background:#fff3ba;border-color:#d7ae2f}
-          .static-insight{display:grid;gap:12px;align-content:start}
-          .static-equation{direction:ltr;display:flex;flex-wrap:wrap;gap:8px;font-size:34px;font-weight:900}
-          .static-equation span{min-width:46px;min-height:46px;display:grid;place-items:center;border-radius:8px;background:#d9f3f0}
-          .static-equation strong{min-width:54px;min-height:46px;display:grid;place-items:center;border-radius:8px;background:#f6c945}
-          .static-note{line-height:1.55;color:#53677a}
-          .static-actions{display:flex;gap:10px;flex-wrap:wrap}
-          .static-actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
-          @media(max-width:850px){.static-app{padding:16px}.static-hero{display:block}.static-hero h1{font-size:38px}.static-layout{grid-template-columns:1fr}.static-table{grid-template-columns:repeat(11,46px);min-width:560px}.static-panel{padding:14px}}
-        </style>
-        <section class="static-shell">
-          <header class="static-hero">
-            <div>
-              <h1>לוח הכפל בקלות</h1>
-              <p>לוח 10x10 אינטראקטיבי בעברית. לחצו על תא כדי לראות תבנית והסבר.</p>
+    <main class="app" dir="rtl" lang="he">
+      <style>
+        *{box-sizing:border-box}
+        body{margin:0}
+        .app{min-height:100vh;padding:24px;font-family:Arial,"Noto Sans Hebrew",sans-serif;color:#14324a;background:#f6fbff;text-align:right}
+        .app[dir="ltr"]{text-align:left}
+        .shell{max-width:1180px;margin:0 auto;display:grid;gap:18px}
+        .hero{display:flex;align-items:end;justify-content:space-between;gap:16px}
+        .hero h1{margin:0;font-size:48px;line-height:1}
+        .hero p{margin:10px 0 0;color:#53677a;font-size:18px;line-height:1.55;direction:inherit;text-align:inherit;unicode-bidi:plaintext}
+        .panel{background:white;border:1px solid #c9dbe8;border-radius:8px;padding:18px;box-shadow:0 18px 45px rgba(20,50,74,.12);min-width:0}
+        .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+        .table-wrap{direction:ltr;overflow:auto}
+        .table{display:grid;grid-template-columns:repeat(11,56px);gap:5px;min-width:670px}
+        .cell,.axis,.corner{min-height:48px;border-radius:7px;display:grid;place-items:center;font-weight:800}
+        .axis,.corner{background:#14324a;color:white}
+        .cell{border:1px solid #d4e2ec;background:white;color:#14324a;cursor:pointer}
+        .cell:hover,.cell.active{background:#d9f3f0;border-color:#087f8c}
+        .cell.selected{background:#ff6b5a;color:white;border-color:#c94736}
+        .cell.mirror{background:#fff3ba;border-color:#d7ae2f}
+        .insight{display:grid;gap:12px;align-content:start}
+        .equation{direction:ltr;text-align:left;display:flex;flex-wrap:wrap;gap:8px;font-size:34px;font-weight:900}
+        .equation span,.equation strong{min-width:46px;min-height:46px;display:grid;place-items:center;border-radius:8px;background:#d9f3f0}
+        .equation strong{min-width:54px;background:#f6c945}
+        .note{line-height:1.6;color:#53677a;direction:inherit;text-align:inherit;unicode-bidi:plaintext}
+        .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
+        .app[dir="rtl"] .actions{justify-content:flex-end}
+        .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
+        h2{margin:0 0 12px}
+        bdi{unicode-bidi:isolate}
+        @media(max-width:850px){
+          .app{padding:16px}
+          .hero{display:block}
+          .hero h1{font-size:38px}
+          .actions{margin-top:14px}
+          .layout{grid-template-columns:1fr}
+          .table{grid-template-columns:repeat(11,46px);min-width:560px}
+          .panel{padding:14px}
+        }
+      </style>
+
+      <section class="shell">
+        <header class="hero">
+          <div>
+            <h1 id="title">לוח הכפל בקלות</h1>
+            <p id="subtitle">לוח 10x10 אינטראקטיבי בעברית. לחצו על תא כדי לראות תבנית והסבר.</p>
+          </div>
+          <div class="actions">
+            <button type="button" id="printButton">הדפסה</button>
+            <button type="button" id="languageButton">English</button>
+          </div>
+        </header>
+
+        <section class="layout">
+          <div class="panel">
+            <h2 id="tableTitle">לוח 10x10 אינטראקטיבי</h2>
+            <div class="table-wrap">
+              <div class="table" id="table" aria-label="לוח הכפל"></div>
             </div>
-            <div class="static-actions">
-              <button type="button" onclick="window.print()">הדפסה</button>
-              <button type="button" onclick="document.documentElement.lang='en';document.documentElement.dir='ltr';document.querySelector('.static-app').dir='ltr'">English</button>
-            </div>
-          </header>
-          <section class="static-layout">
-            <div class="static-panel">
-              <h2 style="margin:0 0 12px">לוח 10x10 אינטראקטיבי</h2>
-              <div class="static-table-wrap">
-                <div class="static-table" id="staticTable" aria-label="לוח הכפל"></div>
-              </div>
-            </div>
-            <aside class="static-panel static-insight" aria-live="polite">
-              <div class="static-equation" id="staticEquation">
-                <span>3</span><span>×</span><span>4</span><span>=</span><strong>12</strong>
-              </div>
-              <p class="static-note" id="staticInsight">3 + 3 + 3 + 3 = 12. אפשר להפוך את הגורמים ולקבל אותה תשובה: 4 × 3 = 12.</p>
-              <p class="static-note">אם אתם רואים את המסך הזה, האפליקציה נטענה במצב בטוח שמתאים לדפדפן הפנימי.</p>
-            </aside>
-          </section>
+          </div>
+
+          <aside class="panel insight" aria-live="polite">
+            <div class="equation" id="equation"></div>
+            <p class="note" id="insight"></p>
+            <p class="note" id="safeMode">
+              מצב בטוח: הדף מוצג בלי ספריות חיצוניות כדי שיעבוד גם בדפדפן הפנימי.
+            </p>
+          </aside>
         </section>
-        <script>
-          (function(){
-            var table=document.getElementById('staticTable');
-            if(!table)return;
-            var selectedA=3,selectedB=4;
-            function clue(a,b){
-              if(a===b)return 'זה מספר ריבועי: שני הגורמים שווים.';
-              if(a===10||b===10)return 'כפולות של 10 מוסיפות אפס.';
-              if(a===5||b===5)return 'כפולות של 5 מסתיימות ב-0 או 5.';
-              if(a===9||b===9)return 'בכפולות של 9 יש תבנית ספרות יפה.';
-              if(a===2||b===2)return 'כפול 2 הוא זוגות.';
-              return 'אפשר להפוך את הגורמים ולקבל אותה תשובה.';
-            }
-            function draw(){
-              table.innerHTML='';
-              var corner=document.createElement('div');
-              corner.className='static-corner';
-              corner.textContent='×';
-              table.appendChild(corner);
-              for(var h=1;h<=10;h++){
-                var head=document.createElement('div');
-                head.className='static-axis';
-                head.textContent=h;
-                table.appendChild(head);
+      </section>
+
+      <script>
+        (function(){
+          var lang = 'he';
+          var selectedA = 3;
+          var selectedB = 4;
+          var table = document.getElementById('table');
+          var app = document.querySelector('.app');
+          var strings = {
+            he: {
+              dir: 'rtl',
+              title: 'לוח הכפל בקלות',
+              subtitle: 'לוח 10x10 אינטראקטיבי בעברית. לחצו על תא כדי לראות תבנית והסבר.',
+              tableTitle: 'לוח 10x10 אינטראקטיבי',
+              print: 'הדפסה',
+              language: 'English',
+              safe: 'מצב בטוח: הדף מוצג בלי ספריות חיצוניות כדי שיעבוד גם בדפדפן הפנימי.',
+              ariaTable: 'לוח הכפל',
+              times: 'כפול',
+              equals: 'שווה',
+              repeatedPrefix: 'חיבור חוזר:',
+              mirrorPrefix: 'חוק החילוף:',
+              cluePrefix: 'רמז:',
+              clues: {
+                square: 'זה מספר ריבועי: שני הגורמים שווים.',
+                ten: 'כפולות של 10 מוסיפות אפס.',
+                five: 'כפולות של 5 מסתיימות ב-0 או 5.',
+                nine: 'בכפולות של 9 יש תבנית ספרות יפה.',
+                two: 'כפול 2 הוא זוגות.',
+                default: 'אפשר להפוך את הגורמים ולקבל אותה תשובה.'
               }
-              for(var a=1;a<=10;a++){
-                var axis=document.createElement('div');
-                axis.className='static-axis';
-                axis.textContent=a;
-                table.appendChild(axis);
-                for(var b=1;b<=10;b++){
-                  var button=document.createElement('button');
-                  button.type='button';
-                  button.className='static-cell';
-                  if(a===selectedA&&b===selectedB)button.className+=' selected';
-                  else if(a===selectedB&&b===selectedA)button.className+=' mirror';
-                  else if(a===selectedA||b===selectedB)button.className+=' active';
-                  button.textContent=a*b;
-                  button.setAttribute('aria-label',a+' כפול '+b+' שווה '+(a*b));
-                  button.onclick=(function(row,col){return function(){selectedA=row;selectedB=col;update();};})(a,b);
-                  table.appendChild(button);
-                }
+            },
+            en: {
+              dir: 'ltr',
+              title: 'Multiplication Made Easy',
+              subtitle: 'An interactive 10x10 multiplication table. Click a cell to see the pattern and explanation.',
+              tableTitle: 'Interactive 10x10 Table',
+              print: 'Print',
+              language: 'עברית',
+              safe: 'Safe mode: this page uses no external libraries so it works in the in-app browser.',
+              ariaTable: 'Multiplication table',
+              times: 'times',
+              equals: 'equals',
+              repeatedPrefix: 'Repeated addition:',
+              mirrorPrefix: 'Commutative fact:',
+              cluePrefix: 'Clue:',
+              clues: {
+                square: 'This is a square number: both factors are equal.',
+                ten: 'Multiples of 10 add a zero.',
+                five: 'Multiples of 5 end in 0 or 5.',
+                nine: 'Multiples of 9 have a useful digit pattern.',
+                two: 'Times 2 means pairs.',
+                default: 'You can swap the factors and keep the same answer.'
               }
             }
-            function update(){
-              var product=selectedA*selectedB;
-              document.getElementById('staticEquation').innerHTML='<span>'+selectedA+'</span><span>×</span><span>'+selectedB+'</span><span>=</span><strong>'+product+'</strong>';
-              var parts=[];
-              for(var i=0;i<selectedB;i++)parts.push(selectedA);
-              document.getElementById('staticInsight').textContent=parts.join(' + ')+' = '+product+'. '+selectedB+' × '+selectedA+' = '+product+'. '+clue(selectedA,selectedB);
-              draw();
+          };
+
+          function escapeHtml(value){
+            return String(value).replace(/[&<>"']/g,function(character){
+              return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character];
+            });
+          }
+
+          function expression(a,b){
+            return a + ' × ' + b + ' = ' + (a*b);
+          }
+
+          function clue(a,b){
+            var c = strings[lang].clues;
+            if(a===b)return c.square;
+            if(a===10||b===10)return c.ten;
+            if(a===5||b===5)return c.five;
+            if(a===9||b===9)return c.nine;
+            if(a===2||b===2)return c.two;
+            return c.default;
+          }
+
+          function applyLanguage(){
+            var t = strings[lang];
+            document.documentElement.lang = lang;
+            document.documentElement.dir = t.dir;
+            app.lang = lang;
+            app.dir = t.dir;
+            document.getElementById('title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('tableTitle').textContent = t.tableTitle;
+            document.getElementById('printButton').textContent = t.print;
+            document.getElementById('languageButton').textContent = t.language;
+            document.getElementById('safeMode').textContent = t.safe;
+            table.setAttribute('aria-label', t.ariaTable);
+            draw();
+            updateInsight();
+          }
+
+          function draw(){
+            var t = strings[lang];
+            table.innerHTML = '';
+            var corner = document.createElement('div');
+            corner.className = 'corner';
+            corner.textContent = '×';
+            table.appendChild(corner);
+
+            for(var h=1;h<=10;h++){
+              var head = document.createElement('div');
+              head.className = 'axis';
+              head.textContent = h;
+              table.appendChild(head);
             }
-            update();
-          })();
-        </script>
-      </main>
-    </div>
+
+            for(var a=1;a<=10;a++){
+              var axis = document.createElement('div');
+              axis.className = 'axis';
+              axis.textContent = a;
+              table.appendChild(axis);
+
+              for(var b=1;b<=10;b++){
+                var button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'cell';
+                if(a===selectedA&&b===selectedB)button.className += ' selected';
+                else if(a===selectedB&&b===selectedA)button.className += ' mirror';
+                else if(a===selectedA||b===selectedB)button.className += ' active';
+                button.textContent = a*b;
+                button.setAttribute('aria-label', a + ' ' + t.times + ' ' + b + ' ' + t.equals + ' ' + (a*b));
+                button.onclick = (function(row,col){
+                  return function(){
+                    selectedA = row;
+                    selectedB = col;
+                    draw();
+                    updateInsight();
+                  };
+                })(a,b);
+                table.appendChild(button);
+              }
+            }
+          }
+
+          function updateInsight(){
+            var product = selectedA * selectedB;
+            var t = strings[lang];
+            var parts = [];
+            for(var i=0;i<selectedB;i++)parts.push(selectedA);
+            var repeated = parts.join(' + ') + ' = ' + product;
+            var mirror = expression(selectedB, selectedA);
+
+            document.getElementById('equation').innerHTML =
+              '<span>' + selectedA + '</span><span>×</span><span>' + selectedB + '</span><span>=</span><strong>' + product + '</strong>';
+
+            document.getElementById('insight').innerHTML =
+              escapeHtml(t.repeatedPrefix) + ' <bdi dir="ltr">' + escapeHtml(repeated) + '</bdi><br>' +
+              escapeHtml(t.mirrorPrefix) + ' <bdi dir="ltr">' + escapeHtml(mirror) + '</bdi><br>' +
+              escapeHtml(t.cluePrefix) + ' ' + escapeHtml(clue(selectedA, selectedB));
+          }
+
+          document.getElementById('printButton').onclick = function(){ window.print(); };
+          document.getElementById('languageButton').onclick = function(){
+            lang = lang === 'he' ? 'en' : 'he';
+            applyLanguage();
+          };
+
+          applyLanguage();
+        })();
+      </script>
+    </main>
   </body>
 </html>
