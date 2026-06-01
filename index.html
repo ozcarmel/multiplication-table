@@ -24,6 +24,8 @@
         .layout{display:grid;grid-template-columns:320px minmax(0,1fr);grid-template-areas:"insight table";gap:18px;align-items:start}
         .table-panel{grid-area:table}
         .insight{grid-area:insight}
+        .side-stack{grid-area:insight;display:grid;gap:18px}
+        .side-stack .insight{grid-area:auto}
         .app[dir="rtl"] .layout{grid-template-columns:320px minmax(0,1fr);grid-template-areas:"insight table"}
         .app[dir="ltr"] .layout{grid-template-columns:320px minmax(0,1fr);grid-template-areas:"insight table"}
         .table-wrap{direction:ltr;overflow:auto}
@@ -55,6 +57,14 @@
         .name-row button{min-height:44px;border:0;border-radius:8px;background:#087f8c;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
         .greeting{margin:0;color:#087f8c;font-size:20px;font-weight:900;line-height:1.4}
         .greeting:empty{display:none}
+        .multiples-panel{display:grid;gap:12px}
+        .multiples-panel h2{margin:0}
+        .multiples-picker{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;direction:ltr}
+        .multiples-picker button{min-height:38px;border:1px solid #c9dbe8;border-radius:8px;background:white;color:#14324a;font-weight:900;cursor:pointer}
+        .multiples-picker button.selected{background:#14324a;color:white;border-color:#14324a}
+        .times-card{background:#dbe46b;border-radius:8px;padding:14px 18px;color:#111;direction:ltr;text-align:left}
+        .times-card h3{margin:0 0 6px;font-size:22px;line-height:1.1}
+        .times-list{display:grid;gap:2px;font-size:20px;line-height:1.18;white-space:nowrap}
         h2{margin:0 0 12px}
         bdi{unicode-bidi:isolate}
         @media(max-width:850px){
@@ -62,7 +72,7 @@
           .hero{display:block}
           .hero h1{font-size:38px}
           .actions{margin-top:14px}
-          .layout{grid-template-columns:1fr}
+          .layout{grid-template-columns:1fr;grid-template-areas:"table" "insight"}
           .table{grid-template-columns:repeat(11,46px);min-width:560px}
           .panel{padding:14px}
         }
@@ -75,7 +85,7 @@
           .hero{display:block;text-align:center;margin:0 0 8mm}
           .hero h1{font-size:26pt;line-height:1.1;margin:0}
           .hero p{display:none}
-          .actions,.name-card{display:none!important}
+          .actions,.name-card,.multiples-panel{display:none!important}
           .layout{display:block}
           .panel{box-shadow:none;border:0;padding:0;background:white}
           .table-panel{break-inside:avoid;page-break-inside:avoid}
@@ -118,18 +128,29 @@
             </div>
             </div>
 
-            <aside class="panel insight" aria-live="polite">
-            <section class="name-card" aria-labelledby="nameLabel">
-              <p class="greeting" id="greeting"></p>
-              <label id="nameLabel" for="childName">איך קוראים לך?</label>
-              <div class="name-row">
-                <input id="childName" name="childName" autocomplete="given-name" />
-                <button type="button" id="saveNameButton">שמירה</button>
-              </div>
-            </section>
-            <div class="equation" id="equation"></div>
-            <div class="insight-lines" id="insight"></div>
-          </aside>
+            <div class="side-stack">
+              <aside class="panel insight" aria-live="polite">
+                <section class="name-card" aria-labelledby="nameLabel">
+                  <p class="greeting" id="greeting"></p>
+                  <label id="nameLabel" for="childName">איך קוראים לך?</label>
+                  <div class="name-row">
+                    <input id="childName" name="childName" autocomplete="given-name" />
+                    <button type="button" id="saveNameButton">שמירה</button>
+                  </div>
+                </section>
+                <div class="equation" id="equation"></div>
+                <div class="insight-lines" id="insight"></div>
+              </aside>
+
+              <section class="panel multiples-panel" aria-labelledby="multiplesTitle">
+                <h2 id="multiplesTitle">כפולות</h2>
+                <div class="multiples-picker" id="multiplesPicker"></div>
+                <article class="times-card">
+                  <h3 id="timesTitle"></h3>
+                  <div class="times-list" id="timesList"></div>
+                </article>
+              </section>
+            </div>
         </section>
       </section>
 
@@ -138,6 +159,7 @@
           var lang = 'he';
           var selectedA = 3;
           var selectedB = 4;
+          var selectedMultiple = 1;
           var table = document.getElementById('table');
           var app = document.querySelector('.app');
           var childName = '';
@@ -160,6 +182,8 @@
               saveName: 'שמירה',
               greeting: 'שלום {name}!',
               noNameGreeting: 'שלום!',
+              multiplesTitle: 'כפולות',
+              timesTitle: 'כפולות של {n}',
               ariaTable: 'לוח הכפל',
               times: 'כפול',
               equals: 'שווה',
@@ -188,6 +212,8 @@
               saveName: 'Save',
               greeting: 'Hello {name}!',
               noNameGreeting: 'Hello!',
+              multiplesTitle: 'Multiples',
+              timesTitle: '{n} times table',
               ariaTable: 'Multiplication table',
               times: 'times',
               equals: 'equals',
@@ -244,10 +270,12 @@
             document.getElementById('nameLabel').textContent = t.nameLabel;
             document.getElementById('childName').placeholder = t.namePlaceholder;
             document.getElementById('saveNameButton').textContent = t.saveName;
+            document.getElementById('multiplesTitle').textContent = t.multiplesTitle;
             table.setAttribute('aria-label', t.ariaTable);
             updateGreeting();
             draw();
             updateInsight();
+            drawMultiples();
           }
 
           function displayName(){
@@ -330,6 +358,37 @@
                 })(a,b);
                 table.appendChild(button);
               }
+            }
+          }
+
+          function drawMultiples(){
+            var t = strings[lang];
+            var picker = document.getElementById('multiplesPicker');
+            var title = document.getElementById('timesTitle');
+            var list = document.getElementById('timesList');
+            picker.innerHTML = '';
+
+            for(var factor=1;factor<=10;factor++){
+              var button = document.createElement('button');
+              button.type = 'button';
+              button.textContent = factor;
+              button.className = factor === selectedMultiple ? 'selected' : '';
+              button.setAttribute('aria-pressed', factor === selectedMultiple ? 'true' : 'false');
+              button.onclick = (function(value){
+                return function(){
+                  selectedMultiple = value;
+                  drawMultiples();
+                };
+              })(factor);
+              picker.appendChild(button);
+            }
+
+            title.textContent = t.timesTitle.replace('{n}', selectedMultiple);
+            list.innerHTML = '';
+            for(var multiplier=1;multiplier<=10;multiplier++){
+              var line = document.createElement('div');
+              line.textContent = selectedMultiple + ' x ' + multiplier + ' = ' + (selectedMultiple * multiplier);
+              list.appendChild(line);
             }
           }
 
