@@ -66,6 +66,7 @@
         .practice-picker button.selected,.practice-mode button.selected{background:#14324a;color:white;border-color:#14324a}
         .practice-mode{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
         .practice-mode button{padding:8px 12px}
+        .practice-mode .practice-clear{border-color:#ffb3a8;color:#c94736}
         .practice-card{background:#fff;border:1px solid #c9dbe8;border-radius:8px;padding:14px 18px;color:#111;width:100%}
         .practice-card h3{margin:0 0 10px;font-size:20px;line-height:1.2}
         .practice-list{display:grid;gap:8px;direction:ltr;text-align:left;font-size:18px;line-height:1.2}
@@ -161,6 +162,7 @@
                 <div class="practice-mode" id="practiceMode">
                   <button type="button" id="orderedMode">לפי סדר</button>
                   <button type="button" id="mixedMode">מעורבב</button>
+                  <button type="button" class="practice-clear" id="clearPracticeButton">נקה</button>
                 </div>
                 <article class="practice-card">
                   <h3 id="practiceCardTitle"></h3>
@@ -204,6 +206,7 @@
               practiceCardTitle: 'תרגול כפולות של {n}',
               ordered: 'לפי סדר',
               mixed: 'מעורבב',
+              clear: 'נקה',
               checkAnswer: 'בדיקה',
               answerLabel: 'תשובה',
               correct: 'נכון',
@@ -240,6 +243,7 @@
               practiceCardTitle: 'Practice {n} times table',
               ordered: 'In order',
               mixed: 'Mixed',
+              clear: 'Clear',
               checkAnswer: 'Check',
               answerLabel: 'Answer',
               correct: 'Correct',
@@ -303,6 +307,7 @@
             document.getElementById('practiceTitle').textContent = t.practiceTitle;
             document.getElementById('orderedMode').textContent = t.ordered;
             document.getElementById('mixedMode').textContent = t.mixed;
+            document.getElementById('clearPracticeButton').textContent = t.clear;
             table.setAttribute('aria-label', t.ariaTable);
             updateGreeting();
             draw();
@@ -399,6 +404,20 @@
             return [7,2,9,4,1,10,5,3,8,6];
           }
 
+          function clearPractice(){
+            document.querySelectorAll('.practice-answer').forEach(function(input){
+              input.value = '';
+            });
+            document.querySelectorAll('.practice-check').forEach(function(button){
+              button.classList.add('hidden');
+            });
+            document.querySelectorAll('.practice-result').forEach(function(result){
+              result.textContent = '';
+              result.className = 'practice-result';
+              result.removeAttribute('aria-label');
+            });
+          }
+
           function drawPractice(){
             var t = strings[lang];
             var picker = document.getElementById('practicePicker');
@@ -406,6 +425,7 @@
             var list = document.getElementById('practiceList');
             var orderedButton = document.getElementById('orderedMode');
             var mixedButton = document.getElementById('mixedMode');
+            var clearButton = document.getElementById('clearPracticeButton');
             picker.innerHTML = '';
 
             for(var factor=1;factor<=10;factor++){
@@ -435,6 +455,7 @@
               practiceMode = 'mixed';
               drawPractice();
             };
+            clearButton.onclick = clearPractice;
 
             title.textContent = t.practiceCardTitle.replace('{n}', selectedPractice);
             list.innerHTML = '';
