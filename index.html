@@ -21,7 +21,11 @@
         .hero h1{margin:0;font-size:48px;line-height:1}
         .hero p{margin:10px 0 0;color:#53677a;font-size:18px;line-height:1.55;direction:inherit;text-align:inherit;unicode-bidi:plaintext}
         .panel{background:white;border:1px solid #c9dbe8;border-radius:8px;padding:18px;box-shadow:0 18px 45px rgba(20,50,74,.12);min-width:0}
-        .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+        .layout{display:grid;grid-template-columns:320px minmax(0,1fr);grid-template-areas:"insight table";gap:18px;align-items:start}
+        .table-panel{grid-area:table}
+        .insight{grid-area:insight}
+        .app[dir="rtl"] .layout{grid-template-columns:320px minmax(0,1fr);grid-template-areas:"insight table"}
+        .app[dir="ltr"] .layout{grid-template-columns:320px minmax(0,1fr);grid-template-areas:"insight table"}
         .table-wrap{direction:ltr;overflow:auto}
         .table{display:grid;grid-template-columns:repeat(11,56px);gap:5px;min-width:670px}
         .cell,.axis,.corner{min-height:48px;border-radius:7px;display:grid;place-items:center;font-weight:800}
@@ -37,13 +41,14 @@
         .note{line-height:1.6;color:#53677a;direction:inherit;text-align:inherit}
         .insight-lines{display:grid;gap:8px;color:#53677a}
         .insight-line{display:flex;flex-wrap:wrap;gap:4px;line-height:1.6;direction:inherit;text-align:inherit}
-        .app[dir="rtl"] .insight-line{justify-content:flex-start}
+        .app[dir="rtl"] .insight-line{justify-content:flex-end}
         .app[dir="ltr"] .insight-line{justify-content:flex-start}
         .math{direction:ltr;unicode-bidi:isolate;display:inline-block}
         .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
         .app[dir="rtl"] .actions{justify-content:flex-end}
         .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
         .name-card{display:grid;gap:10px}
+        .name-card.saved label,.name-card.saved .name-row{display:none}
         .name-card label{font-weight:800}
         .name-row{display:flex;gap:8px;align-items:center}
         .app[dir="rtl"] .name-row{flex-direction:row-reverse}
@@ -76,7 +81,7 @@
         </header>
 
           <section class="layout">
-            <div class="panel">
+            <div class="panel table-panel">
               <h2 id="tableTitle">לוח 10x10 אינטראקטיבי</h2>
             <div class="table-wrap">
               <div class="table" id="table" aria-label="לוח הכפל"></div>
@@ -217,10 +222,16 @@
           function updateGreeting(){
             var t = strings[lang];
             var name = displayName();
+            var nameCard = document.querySelector('.name-card');
             document.getElementById('greeting').textContent = name
               ? t.greeting.replace('{name}', name)
               : t.noNameGreeting;
             document.getElementById('childName').value = childName;
+            if(name) {
+              nameCard.classList.add('saved');
+            } else {
+              nameCard.classList.remove('saved');
+            }
           }
 
           function saveName(){
@@ -287,35 +298,27 @@
 
             var insight = document.getElementById('insight');
             var name = displayName();
-            var namePrefix = '';
-            if(name){
-              namePrefix = lang === 'he'
-                ? '<span>' + escapeHtml(name) + ',</span>'
-                : '<span>' + escapeHtml(name) + ',</span>';
-            }
+            var personalIntro = name ? '<span>' + escapeHtml(name) + ',</span>' : '';
             if(lang === 'he'){
               insight.innerHTML =
                 '<div class="insight-line">' +
-                  namePrefix +
                   '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
                   '<span class="math">' + selectedB + '</span>' +
                   '<span>' + escapeHtml(t.groupsWord) + '</span>' +
                   '<span class="math">' + escapeHtml(parts.join(' + ')) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  namePrefix +
-                  '<span>' + escapeHtml(t.mirrorPrefix) + '</span>' +
+                  personalIntro +
+                  '<span>חוק החילוף מאפשר לנו להפוך את הגורמים ולקבל אותה תשובה:</span>' +
                   '<span class="math">' + escapeHtml(mirror) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  namePrefix +
                   '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
                   '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
                 '</div>';
             } else {
               insight.innerHTML =
                 '<div class="insight-line">' +
-                  namePrefix +
                   '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
                   '<span class="math">' + selectedB + '</span>' +
                   '<span>' + escapeHtml(t.groupsWord) + '</span>' +
@@ -324,12 +327,11 @@
                   '<span class="math">' + escapeHtml(parts.join(' + ') + ' = ' + product) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  namePrefix +
-                  '<span>' + escapeHtml(t.mirrorPrefix) + '</span>' +
+                  personalIntro +
+                  '<span>The commutative fact lets us swap the factors and keep the same answer:</span>' +
                   '<span class="math">' + escapeHtml(mirror) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  namePrefix +
                   '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
                   '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
                 '</div>';
