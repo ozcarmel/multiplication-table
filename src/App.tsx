@@ -58,7 +58,7 @@ const copy = {
     otherLanguage: 'English',
     appName: 'לוח הכפל',
     appTag: 'מעבדת כפל אינטראקטיבית',
-    title: 'לוח הכפל החי',
+    title: 'לוח הכפל בקלות',
     subtitle:
       'נוגעים בתא, רואים תבנית, מתרגלים במשחק קצר, ואוספים ביטחון בלי לחץ.',
     navTitle: 'מסלולי למידה',
@@ -133,7 +133,7 @@ const copy = {
     otherLanguage: 'עברית',
     appName: 'Multiplication Table',
     appTag: 'Interactive multiplication lab',
-    title: 'The Living Times Table',
+    title: 'Multiplication Made Easy',
     subtitle:
       'Tap a cell, see the pattern, play a quick round, and build confidence without pressure.',
     navTitle: 'Learning paths',
