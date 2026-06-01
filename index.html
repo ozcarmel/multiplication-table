@@ -43,6 +43,13 @@
         .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
         .app[dir="rtl"] .actions{justify-content:flex-end}
         .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
+        .name-card{display:grid;gap:10px}
+        .name-card label{font-weight:800}
+        .name-row{display:flex;gap:8px;align-items:center}
+        .app[dir="rtl"] .name-row{flex-direction:row-reverse}
+        .name-row input{min-height:44px;min-width:0;flex:1;border:1px solid #c9dbe8;border-radius:8px;padding:10px 12px;font:inherit;color:#14324a;text-align:inherit;direction:inherit}
+        .name-row button{min-height:44px;border:0;border-radius:8px;background:#087f8c;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
+        .greeting{margin:0;color:#087f8c;font-size:20px;font-weight:900;line-height:1.4}
         h2{margin:0 0 12px}
         bdi{unicode-bidi:isolate}
         @media(max-width:850px){
@@ -68,15 +75,23 @@
           </div>
         </header>
 
-        <section class="layout">
-          <div class="panel">
-            <h2 id="tableTitle">לוח 10x10 אינטראקטיבי</h2>
+          <section class="layout">
+            <div class="panel">
+              <h2 id="tableTitle">לוח 10x10 אינטראקטיבי</h2>
             <div class="table-wrap">
               <div class="table" id="table" aria-label="לוח הכפל"></div>
             </div>
-          </div>
+            </div>
 
-          <aside class="panel insight" aria-live="polite">
+            <aside class="panel insight" aria-live="polite">
+            <section class="name-card" aria-labelledby="nameLabel">
+              <p class="greeting" id="greeting"></p>
+              <label id="nameLabel" for="childName">איך קוראים לך?</label>
+              <div class="name-row">
+                <input id="childName" name="childName" autocomplete="given-name" />
+                <button type="button" id="saveNameButton">שמירה</button>
+              </div>
+            </section>
             <div class="equation" id="equation"></div>
             <div class="insight-lines" id="insight"></div>
           </aside>
@@ -90,6 +105,12 @@
           var selectedB = 4;
           var table = document.getElementById('table');
           var app = document.querySelector('.app');
+          var childName = '';
+          try {
+            childName = localStorage.getItem('multiplication-child-name') || '';
+          } catch (error) {
+            childName = '';
+          }
           var strings = {
             he: {
               dir: 'rtl',
@@ -98,6 +119,11 @@
               tableTitle: 'לוח 10x10 אינטראקטיבי',
               print: 'הדפסה',
               language: 'English',
+              nameLabel: 'איך קוראים לך?',
+              namePlaceholder: 'השם שלך',
+              saveName: 'שמירה',
+              greeting: 'שלום {name}!',
+              noNameGreeting: 'שלום!',
               ariaTable: 'לוח הכפל',
               times: 'כפול',
               equals: 'שווה',
@@ -121,6 +147,11 @@
               tableTitle: 'Interactive 10x10 Table',
               print: 'Print',
               language: 'עברית',
+              nameLabel: 'What is your name?',
+              namePlaceholder: 'Your name',
+              saveName: 'Save',
+              greeting: 'Hello {name}!',
+              noNameGreeting: 'Hello!',
               ariaTable: 'Multiplication table',
               times: 'times',
               equals: 'equals',
@@ -170,8 +201,34 @@
             document.getElementById('tableTitle').textContent = t.tableTitle;
             document.getElementById('printButton').textContent = t.print;
             document.getElementById('languageButton').textContent = t.language;
+            document.getElementById('nameLabel').textContent = t.nameLabel;
+            document.getElementById('childName').placeholder = t.namePlaceholder;
+            document.getElementById('saveNameButton').textContent = t.saveName;
             table.setAttribute('aria-label', t.ariaTable);
+            updateGreeting();
             draw();
+            updateInsight();
+          }
+
+          function displayName(){
+            return childName.trim();
+          }
+
+          function updateGreeting(){
+            var t = strings[lang];
+            var name = displayName();
+            document.getElementById('greeting').textContent = name
+              ? t.greeting.replace('{name}', name)
+              : t.noNameGreeting;
+            document.getElementById('childName').value = childName;
+          }
+
+          function saveName(){
+            childName = document.getElementById('childName').value.trim().slice(0, 24);
+            try {
+              localStorage.setItem('multiplication-child-name', childName);
+            } catch (error) {}
+            updateGreeting();
             updateInsight();
           }
 
@@ -229,25 +286,36 @@
               '<span>' + selectedA + '</span><span>×</span><span>' + selectedB + '</span><span>=</span><strong>' + product + '</strong>';
 
             var insight = document.getElementById('insight');
+            var name = displayName();
+            var namePrefix = '';
+            if(name){
+              namePrefix = lang === 'he'
+                ? '<span>' + escapeHtml(name) + ',</span>'
+                : '<span>' + escapeHtml(name) + ',</span>';
+            }
             if(lang === 'he'){
               insight.innerHTML =
                 '<div class="insight-line">' +
+                  namePrefix +
                   '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
                   '<span class="math">' + selectedB + '</span>' +
                   '<span>' + escapeHtml(t.groupsWord) + '</span>' +
                   '<span class="math">' + escapeHtml(parts.join(' + ')) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
+                  namePrefix +
                   '<span>' + escapeHtml(t.mirrorPrefix) + '</span>' +
                   '<span class="math">' + escapeHtml(mirror) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
+                  namePrefix +
                   '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
                   '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
                 '</div>';
             } else {
               insight.innerHTML =
                 '<div class="insight-line">' +
+                  namePrefix +
                   '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
                   '<span class="math">' + selectedB + '</span>' +
                   '<span>' + escapeHtml(t.groupsWord) + '</span>' +
@@ -256,10 +324,12 @@
                   '<span class="math">' + escapeHtml(parts.join(' + ') + ' = ' + product) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
+                  namePrefix +
                   '<span>' + escapeHtml(t.mirrorPrefix) + '</span>' +
                   '<span class="math">' + escapeHtml(mirror) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
+                  namePrefix +
                   '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
                   '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
                 '</div>';
@@ -267,6 +337,10 @@
           }
 
           document.getElementById('printButton').onclick = function(){ window.print(); };
+          document.getElementById('saveNameButton').onclick = saveName;
+          document.getElementById('childName').onkeydown = function(event){
+            if(event.key === 'Enter') saveName();
+          };
           document.getElementById('languageButton').onclick = function(){
             lang = lang === 'he' ? 'en' : 'he';
             applyLanguage();
