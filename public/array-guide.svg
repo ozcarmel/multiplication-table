@@ -1,0 +1,24 @@
+<svg width="640" height="420" viewBox="0 0 640 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Array learning guide</title>
+  <desc id="desc">A friendly learning-board illustration with rows, columns, stars, and multiplication blocks.</desc>
+  <rect width="640" height="420" rx="28" fill="#EAF7FF"/>
+  <rect x="54" y="58" width="338" height="260" rx="18" fill="#FFFFFF" stroke="#14324A" stroke-width="8"/>
+  <path d="M85 112H360M85 166H360M85 220H360M85 274H360" stroke="#BCD9E8" stroke-width="8" stroke-linecap="round"/>
+  <path d="M140 88V292M198 88V292M256 88V292M314 88V292" stroke="#BCD9E8" stroke-width="8" stroke-linecap="round"/>
+  <rect x="142" y="114" width="52" height="48" rx="10" fill="#FFE066"/>
+  <rect x="200" y="114" width="52" height="48" rx="10" fill="#FFE066"/>
+  <rect x="258" y="114" width="52" height="48" rx="10" fill="#FFE066"/>
+  <rect x="142" y="168" width="52" height="48" rx="10" fill="#51CF66"/>
+  <rect x="200" y="168" width="52" height="48" rx="10" fill="#51CF66"/>
+  <rect x="258" y="168" width="52" height="48" rx="10" fill="#51CF66"/>
+  <path d="M444 218C444 175.474 478.474 141 521 141C563.526 141 598 175.474 598 218V316C598 334.778 582.778 350 564 350H478C459.222 350 444 334.778 444 316V218Z" fill="#FF6B5A"/>
+  <circle cx="495" cy="222" r="9" fill="#14324A"/>
+  <circle cx="548" cy="222" r="9" fill="#14324A"/>
+  <path d="M497 264C511.989 276.42 533.45 276.275 547 264" stroke="#14324A" stroke-width="8" stroke-linecap="round"/>
+  <path d="M460 143L438 100M565 143L589 98" stroke="#14324A" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="431" cy="91" r="15" fill="#FFE066" stroke="#14324A" stroke-width="7"/>
+  <circle cx="594" cy="88" r="15" fill="#51CF66" stroke="#14324A" stroke-width="7"/>
+  <path d="M93 355H365" stroke="#14324A" stroke-width="12" stroke-linecap="round"/>
+  <path d="M112 30L119 49L139 50L123 62L128 82L112 70L95 82L100 62L84 50L104 49L112 30Z" fill="#FF6B5A"/>
+  <path d="M430 40L438 61L460 62L442 76L448 98L430 85L412 98L418 76L400 62L422 61L430 40Z" fill="#FFE066"/>
+</svg>
