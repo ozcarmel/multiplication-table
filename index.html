@@ -66,6 +66,36 @@
           .table{grid-template-columns:repeat(11,46px);min-width:560px}
           .panel{padding:14px}
         }
+        @media print{
+          @page{size:A4 portrait;margin:10mm}
+          *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+          body{background:white}
+          .app{min-height:auto;padding:0;background:white;color:#111;text-align:center}
+          .shell{max-width:none;margin:0;display:block}
+          .hero{display:block;text-align:center;margin:0 0 8mm}
+          .hero h1{font-size:26pt;line-height:1.1;margin:0}
+          .hero p{display:none}
+          .actions,.name-card{display:none!important}
+          .layout{display:block}
+          .panel{box-shadow:none;border:0;padding:0;background:white}
+          .table-panel{break-inside:avoid;page-break-inside:avoid}
+          .table-panel h2{font-size:14pt;margin:0 0 5mm;text-align:center}
+          .table-wrap{overflow:visible;width:100%;direction:ltr}
+          .table{display:grid;grid-template-columns:repeat(11,15.8mm);gap:1.2mm;min-width:0;width:max-content;margin:0 auto}
+          .cell,.axis,.corner{min-height:10.8mm;border-radius:2mm;font-size:11pt;font-weight:800}
+          .axis,.corner{background:#14324a!important;color:white!important}
+          .cell{background:white!important;border:1px solid #9db8ca;color:#111}
+          .cell.active{background:#e7f6f4!important;border-color:#9db8ca}
+          .cell.mirror{background:#fff6c9!important;border-color:#c3a63b}
+          .cell.selected{background:#ff6b5a!important;color:white!important;border-color:#b33f32}
+          .insight{margin-top:7mm;border-top:1px solid #c9dbe8;padding-top:5mm;break-inside:avoid;page-break-inside:avoid}
+          .insight.panel{border-inline:0;border-bottom:0}
+          .equation{justify-content:center;font-size:20pt;gap:2mm;margin-bottom:3mm}
+          .equation span,.equation strong{min-width:12mm;min-height:11mm;border-radius:2mm;background:#d9f3f0!important}
+          .equation strong{background:#f6c945!important}
+          .insight-lines{max-width:170mm;margin:0 auto;gap:2mm;font-size:11pt;color:#333}
+          .insight-line{text-align:inherit}
+        }
       </style>
 
       <section class="shell">
