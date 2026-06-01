@@ -34,7 +34,12 @@
         .equation{direction:ltr;text-align:left;display:flex;flex-wrap:wrap;gap:8px;font-size:34px;font-weight:900}
         .equation span,.equation strong{min-width:46px;min-height:46px;display:grid;place-items:center;border-radius:8px;background:#d9f3f0}
         .equation strong{min-width:54px;background:#f6c945}
-        .note{line-height:1.6;color:#53677a;direction:inherit;text-align:inherit;unicode-bidi:plaintext}
+        .note{line-height:1.6;color:#53677a;direction:inherit;text-align:inherit}
+        .insight-lines{display:grid;gap:8px;color:#53677a}
+        .insight-line{display:flex;flex-wrap:wrap;gap:4px;line-height:1.6;direction:inherit;text-align:inherit}
+        .app[dir="rtl"] .insight-line{justify-content:flex-start}
+        .app[dir="ltr"] .insight-line{justify-content:flex-start}
+        .math{direction:ltr;unicode-bidi:isolate;display:inline-block}
         .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
         .app[dir="rtl"] .actions{justify-content:flex-end}
         .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
@@ -73,7 +78,7 @@
 
           <aside class="panel insight" aria-live="polite">
             <div class="equation" id="equation"></div>
-            <p class="note" id="insight"></p>
+            <div class="insight-lines" id="insight"></div>
             <p class="note" id="safeMode">
               מצב בטוח: הדף מוצג בלי ספריות חיצוניות כדי שיעבוד גם בדפדפן הפנימי.
             </p>
@@ -101,7 +106,7 @@
               times: 'כפול',
               equals: 'שווה',
               repeatedPrefix: 'קבוצות שוות:',
-              groupsWord: 'קבוצות של',
+              groupsWord: 'קבוצות שוות של',
               mirrorPrefix: 'חוק החילוף:',
               cluePrefix: 'רמז:',
               clues: {
@@ -224,18 +229,47 @@
             var t = strings[lang];
             var parts = [];
             for(var i=0;i<selectedB;i++)parts.push(selectedA);
-            var repeated = lang === 'he'
-              ? selectedB + ' ' + t.groupsWord + ' ' + selectedA + ': ' + parts.join(' + ') + ' = ' + product
-              : selectedB + ' ' + t.groupsWord + ' ' + selectedA + ': ' + parts.join(' + ') + ' = ' + product;
             var mirror = expression(selectedB, selectedA);
 
             document.getElementById('equation').innerHTML =
               '<span>' + selectedA + '</span><span>×</span><span>' + selectedB + '</span><span>=</span><strong>' + product + '</strong>';
 
-            document.getElementById('insight').innerHTML =
-              escapeHtml(t.repeatedPrefix) + ' <bdi dir="ltr">' + escapeHtml(repeated) + '</bdi><br>' +
-              escapeHtml(t.mirrorPrefix) + ' <bdi dir="ltr">' + escapeHtml(mirror) + '</bdi><br>' +
-              escapeHtml(t.cluePrefix) + ' ' + escapeHtml(clue(selectedA, selectedB));
+            var insight = document.getElementById('insight');
+            if(lang === 'he'){
+              insight.innerHTML =
+                '<div class="insight-line">' +
+                  '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
+                  '<span class="math">' + selectedB + '</span>' +
+                  '<span>' + escapeHtml(t.groupsWord) + '</span>' +
+                  '<span class="math">' + escapeHtml(parts.join(' + ')) + '</span>' +
+                '</div>' +
+                '<div class="insight-line">' +
+                  '<span>' + escapeHtml(t.mirrorPrefix) + '</span>' +
+                  '<span class="math">' + escapeHtml(mirror) + '</span>' +
+                '</div>' +
+                '<div class="insight-line">' +
+                  '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
+                  '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
+                '</div>';
+            } else {
+              insight.innerHTML =
+                '<div class="insight-line">' +
+                  '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
+                  '<span class="math">' + selectedB + '</span>' +
+                  '<span>' + escapeHtml(t.groupsWord) + '</span>' +
+                  '<span class="math">' + selectedA + '</span>' +
+                  '<span>:</span>' +
+                  '<span class="math">' + escapeHtml(parts.join(' + ') + ' = ' + product) + '</span>' +
+                '</div>' +
+                '<div class="insight-line">' +
+                  '<span>' + escapeHtml(t.mirrorPrefix) + '</span>' +
+                  '<span class="math">' + escapeHtml(mirror) + '</span>' +
+                '</div>' +
+                '<div class="insight-line">' +
+                  '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
+                  '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
+                '</div>';
+            }
           }
 
           document.getElementById('printButton').onclick = function(){ window.print(); };
