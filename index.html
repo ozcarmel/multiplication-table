@@ -50,18 +50,6 @@
         .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
         .app[dir="rtl"] .actions{justify-content:flex-end}
         .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
-        .name-card{display:grid;gap:10px}
-        .name-card.saved label,.name-card.saved .name-row{display:none}
-        .name-card:not(.saved) .change-name-button{display:none}
-        .name-card label{font-weight:800}
-        .name-row{display:flex;gap:8px;align-items:center}
-        .app[dir="rtl"] .name-row{flex-direction:row-reverse}
-        .name-row input{min-height:44px;min-width:0;flex:1;border:1px solid #c9dbe8;border-radius:8px;padding:10px 12px;font:inherit;color:#14324a;text-align:inherit;direction:inherit}
-        .name-row button{min-height:44px;border:0;border-radius:8px;background:#087f8c;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
-        .change-name-button{justify-self:start;min-height:36px;border:1px solid #c9dbe8;border-radius:8px;background:white;color:#14324a;padding:7px 10px;font-weight:800;cursor:pointer}
-        .app[dir="rtl"] .change-name-button{justify-self:end}
-        .greeting{margin:0;color:#087f8c;font-size:20px;font-weight:900;line-height:1.4}
-        .greeting:empty{display:none}
         .practice-panel{display:grid;gap:14px;justify-items:center;text-align:center;background:#fffdf7;border-color:#f6c945}
         .practice-panel h2{margin:0;text-align:center;width:100%;font-size:26px;color:#14324a}
         .practice-picker{display:grid;grid-template-columns:repeat(5,50px);gap:8px;direction:ltr;justify-content:center;padding:10px;border-radius:8px;background:#e9f7f5;border:1px solid #c5e9e3}
@@ -108,7 +96,7 @@
           .hero{display:block;text-align:center;margin:0 0 8mm}
           .hero h1{font-size:26pt;line-height:1.1;margin:0}
           .hero p{display:none}
-          .actions,.name-card,.practice-panel{display:none!important}
+          .actions,.practice-panel{display:none!important}
           .layout{display:block}
           .panel{box-shadow:none;border:0;padding:0;background:white}
           .table-panel{break-inside:avoid;page-break-inside:avoid}
@@ -153,15 +141,6 @@
 
             <div class="side-stack">
               <aside class="panel insight" aria-live="polite">
-                <section class="name-card" aria-labelledby="nameLabel">
-                  <p class="greeting" id="greeting"></p>
-                  <label id="nameLabel" for="childName">איך קוראים לך?</label>
-                  <div class="name-row">
-                    <input id="childName" name="childName" autocomplete="given-name" />
-                    <button type="button" id="saveNameButton">שמירה</button>
-                  </div>
-                  <button type="button" class="change-name-button" id="changeNameButton">שנה שם</button>
-                </section>
                 <div class="equation" id="equation"></div>
                 <div class="insight-lines" id="insight"></div>
               </aside>
@@ -193,13 +172,6 @@
           var practiceMode = 'ordered';
           var table = document.getElementById('table');
           var app = document.querySelector('.app');
-          var childName = '';
-          var greetingTimer = null;
-          try {
-            childName = localStorage.getItem('multiplication-child-name') || '';
-          } catch (error) {
-            childName = '';
-          }
           var strings = {
             he: {
               dir: 'rtl',
@@ -208,11 +180,6 @@
               tableTitle: 'לוח 10x10 אינטראקטיבי',
               print: 'הדפסה',
               language: 'English',
-              nameLabel: 'איך קוראים לך?',
-              namePlaceholder: 'השם שלך',
-              saveName: 'שמירה',
-              changeName: 'שנה שם',
-              greeting: 'שלום {name}!',
               noNameGreeting: 'שלום!',
               practiceTitle: 'תרגול',
               practiceCardTitle: 'תרגול כפולות של {n}',
@@ -247,11 +214,6 @@
               tableTitle: 'Interactive 10x10 Table',
               print: 'Print',
               language: 'עברית',
-              nameLabel: 'What is your name?',
-              namePlaceholder: 'Your name',
-              saveName: 'Save',
-              changeName: 'Change name',
-              greeting: 'Hello {name}!',
               noNameGreeting: 'Hello!',
               practiceTitle: 'Practice',
               practiceCardTitle: 'Practice {n} times table',
@@ -316,72 +278,15 @@
             document.getElementById('tableTitle').textContent = t.tableTitle;
             document.getElementById('printButton').textContent = t.print;
             document.getElementById('languageButton').textContent = t.language;
-            document.getElementById('nameLabel').textContent = t.nameLabel;
-            document.getElementById('childName').placeholder = t.namePlaceholder;
-            document.getElementById('saveNameButton').textContent = t.saveName;
-            document.getElementById('changeNameButton').textContent = t.changeName;
             document.getElementById('practiceTitle').textContent = t.practiceTitle;
             document.getElementById('orderedMode').textContent = t.ordered;
             document.getElementById('mixedMode').textContent = t.mixed;
             document.getElementById('revealPracticeButton').textContent = t.reveal;
             document.getElementById('clearPracticeButton').textContent = t.clear;
             table.setAttribute('aria-label', t.ariaTable);
-            updateGreeting();
             draw();
             updateInsight();
             drawPractice();
-          }
-
-          function displayName(){
-            return childName.trim();
-          }
-
-          function updateGreeting(){
-            var t = strings[lang];
-            var name = displayName();
-            var nameCard = document.querySelector('.name-card');
-            if(!name){
-              document.getElementById('greeting').textContent = t.noNameGreeting;
-            }
-            document.getElementById('childName').value = childName;
-            if(name) {
-              nameCard.classList.add('saved');
-            } else {
-              nameCard.classList.remove('saved');
-            }
-          }
-
-          function showTemporaryGreeting(){
-            var t = strings[lang];
-            var name = displayName();
-            var greeting = document.getElementById('greeting');
-            if(greetingTimer) window.clearTimeout(greetingTimer);
-            greeting.textContent = name ? t.greeting.replace('{name}', name) : t.noNameGreeting;
-            greetingTimer = window.setTimeout(function(){
-              greeting.textContent = '';
-            }, 2400);
-          }
-
-          function saveName(){
-            childName = document.getElementById('childName').value.trim().slice(0, 24);
-            try {
-              localStorage.setItem('multiplication-child-name', childName);
-            } catch (error) {}
-            updateGreeting();
-            showTemporaryGreeting();
-            updateInsight();
-          }
-
-          function changeName(){
-            childName = '';
-            if(greetingTimer) window.clearTimeout(greetingTimer);
-            try {
-              localStorage.removeItem('multiplication-child-name');
-            } catch (error) {}
-            document.getElementById('greeting').textContent = '';
-            updateGreeting();
-            updateInsight();
-            document.getElementById('childName').focus();
           }
 
           function draw(){
@@ -556,8 +461,6 @@
               '<span>' + selectedA + '</span><span>×</span><span>' + selectedB + '</span><span>=</span><strong>' + product + '</strong>';
 
             var insight = document.getElementById('insight');
-            var name = displayName();
-            var personalIntro = name ? '<span>' + escapeHtml(name) + ',</span>' : '';
             if(lang === 'he'){
               insight.innerHTML =
                 '<div class="insight-line">' +
@@ -569,7 +472,7 @@
                   '<span class="math">' + escapeHtml(parts.join(' + ')) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  escapeHtml((name ? name + ', ' : '') + 'חוק החילוף מאפשר לנו להפוך את הגורמים ולקבל אותה תשובה: ' + isolateLtr(mirror)) +
+                  escapeHtml('חוק החילוף מאפשר לנו להפוך את הגורמים ולקבל אותה תשובה: ' + isolateLtr(mirror)) +
                 '</div>' +
                 '<div class="insight-line">' +
                   '<strong>' + escapeHtml(t.cluePrefix) + '</strong> ' +
@@ -587,7 +490,6 @@
                   '<span class="math">' + escapeHtml(parts.join(' + ') + ' = ' + product) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  personalIntro +
                   '<span>The commutative fact lets us swap the factors and keep the same answer:</span>' +
                   '<span class="math">' + escapeHtml(mirror) + '</span>' +
                 '</div>' +
@@ -599,11 +501,6 @@
           }
 
           document.getElementById('printButton').onclick = function(){ window.print(); };
-          document.getElementById('saveNameButton').onclick = saveName;
-          document.getElementById('changeNameButton').onclick = changeName;
-          document.getElementById('childName').onkeydown = function(event){
-            if(event.key === 'Enter') saveName();
-          };
           document.getElementById('languageButton').onclick = function(){
             lang = lang === 'he' ? 'en' : 'he';
             applyLanguage();
