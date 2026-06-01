@@ -79,9 +79,6 @@
           <aside class="panel insight" aria-live="polite">
             <div class="equation" id="equation"></div>
             <div class="insight-lines" id="insight"></div>
-            <p class="note" id="safeMode">
-              מצב בטוח: הדף מוצג בלי ספריות חיצוניות כדי שיעבוד גם בדפדפן הפנימי.
-            </p>
           </aside>
         </section>
       </section>
@@ -101,7 +98,6 @@
               tableTitle: 'לוח 10x10 אינטראקטיבי',
               print: 'הדפסה',
               language: 'English',
-              safe: 'מצב בטוח: הדף מוצג בלי ספריות חיצוניות כדי שיעבוד גם בדפדפן הפנימי.',
               ariaTable: 'לוח הכפל',
               times: 'כפול',
               equals: 'שווה',
@@ -125,7 +121,6 @@
               tableTitle: 'Interactive 10x10 Table',
               print: 'Print',
               language: 'עברית',
-              safe: 'Safe mode: this page uses no external libraries so it works in the in-app browser.',
               ariaTable: 'Multiplication table',
               times: 'times',
               equals: 'equals',
@@ -175,7 +170,6 @@
             document.getElementById('tableTitle').textContent = t.tableTitle;
             document.getElementById('printButton').textContent = t.print;
             document.getElementById('languageButton').textContent = t.language;
-            document.getElementById('safeMode').textContent = t.safe;
             table.setAttribute('aria-label', t.ariaTable);
             draw();
             updateInsight();
