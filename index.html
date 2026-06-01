@@ -44,7 +44,9 @@
         .insight-lines{display:grid;gap:8px;color:#53677a}
         .insight-line{display:block;line-height:1.6;direction:inherit;text-align:inherit}
         .app[dir="ltr"] .insight-line{justify-content:flex-start}
+        .insight-line span + span{margin-inline-start:4px}
         .math{direction:ltr;unicode-bidi:isolate;display:inline-block}
+        .addition-line{display:block;max-width:100%;direction:ltr;unicode-bidi:isolate;text-align:inherit;white-space:nowrap;overflow-x:auto;font-size:16px}
         .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
         .app[dir="rtl"] .actions{justify-content:flex-end}
         .actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
@@ -65,6 +67,18 @@
         .times-card{background:#dbe46b;border-radius:8px;padding:14px 18px;color:#111;direction:ltr;text-align:center;width:min(100%,230px)}
         .times-card h3{margin:0 0 6px;font-size:22px;line-height:1.1}
         .times-list{display:grid;gap:2px;font-size:20px;line-height:1.18;white-space:nowrap}
+        .practice-panel{display:grid;gap:12px;justify-items:center;text-align:center}
+        .practice-panel h2{margin:0;text-align:center;width:100%}
+        .practice-picker{display:grid;grid-template-columns:repeat(5,50px);gap:8px;direction:ltr;justify-content:center}
+        .practice-picker button,.practice-mode button{min-height:38px;border:1px solid #c9dbe8;border-radius:8px;background:white;color:#14324a;font-weight:900;cursor:pointer}
+        .practice-picker button.selected,.practice-mode button.selected{background:#14324a;color:white;border-color:#14324a}
+        .practice-mode{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
+        .practice-mode button{padding:8px 12px}
+        .practice-card{background:#fff;border:1px solid #c9dbe8;border-radius:8px;padding:14px 18px;color:#111;width:min(100%,260px)}
+        .practice-card h3{margin:0 0 10px;font-size:20px;line-height:1.2}
+        .practice-list{display:grid;gap:6px;direction:ltr;text-align:left;font-size:18px;line-height:1.2}
+        .practice-item{display:flex;justify-content:space-between;gap:14px;border-bottom:1px dashed #c9dbe8;padding-bottom:4px}
+        .practice-item:last-child{border-bottom:0;padding-bottom:0}
         h2{margin:0 0 12px}
         bdi{unicode-bidi:isolate}
         @media(max-width:850px){
@@ -85,7 +99,7 @@
           .hero{display:block;text-align:center;margin:0 0 8mm}
           .hero h1{font-size:26pt;line-height:1.1;margin:0}
           .hero p{display:none}
-          .actions,.name-card,.multiples-panel{display:none!important}
+          .actions,.name-card,.multiples-panel,.practice-panel{display:none!important}
           .layout{display:block}
           .panel{box-shadow:none;border:0;padding:0;background:white}
           .table-panel{break-inside:avoid;page-break-inside:avoid}
@@ -150,6 +164,19 @@
                   <div class="times-list" id="timesList"></div>
                 </article>
               </section>
+
+              <section class="panel practice-panel" aria-labelledby="practiceTitle">
+                <h2 id="practiceTitle">תרגול</h2>
+                <div class="practice-picker" id="practicePicker"></div>
+                <div class="practice-mode" id="practiceMode">
+                  <button type="button" id="orderedMode">לפי סדר</button>
+                  <button type="button" id="mixedMode">מעורבב</button>
+                </div>
+                <article class="practice-card">
+                  <h3 id="practiceCardTitle"></h3>
+                  <div class="practice-list" id="practiceList"></div>
+                </article>
+              </section>
             </div>
         </section>
       </section>
@@ -160,6 +187,8 @@
           var selectedA = 3;
           var selectedB = 4;
           var selectedMultiple = 1;
+          var selectedPractice = 1;
+          var practiceMode = 'ordered';
           var table = document.getElementById('table');
           var app = document.querySelector('.app');
           var childName = '';
@@ -184,6 +213,10 @@
               noNameGreeting: 'שלום!',
               multiplesTitle: 'כפולות',
               timesTitle: 'כפולות של {n}',
+              practiceTitle: 'תרגול',
+              practiceCardTitle: 'תרגול כפולות של {n}',
+              ordered: 'לפי סדר',
+              mixed: 'מעורבב',
               ariaTable: 'לוח הכפל',
               times: 'כפול',
               equals: 'שווה',
@@ -214,6 +247,10 @@
               noNameGreeting: 'Hello!',
               multiplesTitle: 'Multiples',
               timesTitle: '{n} times table',
+              practiceTitle: 'Practice',
+              practiceCardTitle: 'Practice {n} times table',
+              ordered: 'In order',
+              mixed: 'Mixed',
               ariaTable: 'Multiplication table',
               times: 'times',
               equals: 'equals',
@@ -271,11 +308,15 @@
             document.getElementById('childName').placeholder = t.namePlaceholder;
             document.getElementById('saveNameButton').textContent = t.saveName;
             document.getElementById('multiplesTitle').textContent = t.multiplesTitle;
+            document.getElementById('practiceTitle').textContent = t.practiceTitle;
+            document.getElementById('orderedMode').textContent = t.ordered;
+            document.getElementById('mixedMode').textContent = t.mixed;
             table.setAttribute('aria-label', t.ariaTable);
             updateGreeting();
             draw();
             updateInsight();
             drawMultiples();
+            drawPractice();
           }
 
           function displayName(){
@@ -392,6 +433,59 @@
             }
           }
 
+          function practiceNumbers(){
+            var ordered = [1,2,3,4,5,6,7,8,9,10];
+            if(practiceMode === 'ordered') return ordered;
+            return [7,2,9,4,1,10,5,3,8,6];
+          }
+
+          function drawPractice(){
+            var t = strings[lang];
+            var picker = document.getElementById('practicePicker');
+            var title = document.getElementById('practiceCardTitle');
+            var list = document.getElementById('practiceList');
+            var orderedButton = document.getElementById('orderedMode');
+            var mixedButton = document.getElementById('mixedMode');
+            picker.innerHTML = '';
+
+            for(var factor=1;factor<=10;factor++){
+              var button = document.createElement('button');
+              button.type = 'button';
+              button.textContent = factor;
+              button.className = factor === selectedPractice ? 'selected' : '';
+              button.setAttribute('aria-pressed', factor === selectedPractice ? 'true' : 'false');
+              button.onclick = (function(value){
+                return function(){
+                  selectedPractice = value;
+                  drawPractice();
+                };
+              })(factor);
+              picker.appendChild(button);
+            }
+
+            orderedButton.className = practiceMode === 'ordered' ? 'selected' : '';
+            mixedButton.className = practiceMode === 'mixed' ? 'selected' : '';
+            orderedButton.setAttribute('aria-pressed', practiceMode === 'ordered' ? 'true' : 'false');
+            mixedButton.setAttribute('aria-pressed', practiceMode === 'mixed' ? 'true' : 'false');
+            orderedButton.onclick = function(){
+              practiceMode = 'ordered';
+              drawPractice();
+            };
+            mixedButton.onclick = function(){
+              practiceMode = 'mixed';
+              drawPractice();
+            };
+
+            title.textContent = t.practiceCardTitle.replace('{n}', selectedPractice);
+            list.innerHTML = '';
+            practiceNumbers().forEach(function(multiplier){
+              var line = document.createElement('div');
+              line.className = 'practice-item';
+              line.innerHTML = '<span>' + selectedPractice + ' x ' + multiplier + '</span><strong>= ___</strong>';
+              list.appendChild(line);
+            });
+          }
+
           function updateInsight(){
             var product = selectedA * selectedB;
             var t = strings[lang];
@@ -409,7 +503,11 @@
               insight.innerHTML =
                 '<div class="insight-line">' +
                   '<strong>' + escapeHtml(t.repeatedPrefix) + '</strong> ' +
-                  escapeHtml(isolateLtr(selectedB) + ' ' + t.groupsWord + ' ' + isolateLtr(parts.join(' + '))) +
+                  '<span class="math">' + selectedB + '</span> ' +
+                  '<span>' + escapeHtml(t.groupsWord) + '</span>' +
+                '</div>' +
+                '<div class="insight-line addition-line">' +
+                  '<span class="math">' + escapeHtml(parts.join(' + ')) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
                   escapeHtml((name ? name + ', ' : '') + 'חוק החילוף מאפשר לנו להפוך את הגורמים ולקבל אותה תשובה: ' + isolateLtr(mirror)) +
@@ -425,7 +523,8 @@
                   '<span class="math">' + selectedB + '</span>' +
                   '<span>' + escapeHtml(t.groupsWord) + '</span>' +
                   '<span class="math">' + selectedA + '</span>' +
-                  '<span>:</span>' +
+                '</div>' +
+                '<div class="insight-line addition-line">' +
                   '<span class="math">' + escapeHtml(parts.join(' + ') + ' = ' + product) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
