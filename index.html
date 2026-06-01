@@ -40,8 +40,7 @@
         .equation strong{min-width:54px;background:#f6c945}
         .note{line-height:1.6;color:#53677a;direction:inherit;text-align:inherit}
         .insight-lines{display:grid;gap:8px;color:#53677a}
-        .insight-line{display:flex;flex-wrap:wrap;gap:4px;line-height:1.6;direction:inherit;text-align:inherit}
-        .app[dir="rtl"] .insight-line{justify-content:flex-end}
+        .insight-line{display:block;line-height:1.6;direction:inherit;text-align:inherit}
         .app[dir="ltr"] .insight-line{justify-content:flex-start}
         .math{direction:ltr;unicode-bidi:isolate;display:inline-block}
         .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start}
@@ -55,6 +54,7 @@
         .name-row input{min-height:44px;min-width:0;flex:1;border:1px solid #c9dbe8;border-radius:8px;padding:10px 12px;font:inherit;color:#14324a;text-align:inherit;direction:inherit}
         .name-row button{min-height:44px;border:0;border-radius:8px;background:#087f8c;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
         .greeting{margin:0;color:#087f8c;font-size:20px;font-weight:900;line-height:1.4}
+        .greeting:empty{display:none}
         h2{margin:0 0 12px}
         bdi{unicode-bidi:isolate}
         @media(max-width:850px){
@@ -111,6 +111,7 @@
           var table = document.getElementById('table');
           var app = document.querySelector('.app');
           var childName = '';
+          var greetingTimer = null;
           try {
             childName = localStorage.getItem('multiplication-child-name') || '';
           } catch (error) {
@@ -185,6 +186,10 @@
             return a + ' × ' + b + ' = ' + (a*b);
           }
 
+          function isolateLtr(value){
+            return '\u2066' + value + '\u2069';
+          }
+
           function clue(a,b){
             var c = strings[lang].clues;
             if(a===b)return c.square;
@@ -223,9 +228,9 @@
             var t = strings[lang];
             var name = displayName();
             var nameCard = document.querySelector('.name-card');
-            document.getElementById('greeting').textContent = name
-              ? t.greeting.replace('{name}', name)
-              : t.noNameGreeting;
+            if(!name){
+              document.getElementById('greeting').textContent = t.noNameGreeting;
+            }
             document.getElementById('childName').value = childName;
             if(name) {
               nameCard.classList.add('saved');
@@ -234,12 +239,24 @@
             }
           }
 
+          function showTemporaryGreeting(){
+            var t = strings[lang];
+            var name = displayName();
+            var greeting = document.getElementById('greeting');
+            if(greetingTimer) window.clearTimeout(greetingTimer);
+            greeting.textContent = name ? t.greeting.replace('{name}', name) : t.noNameGreeting;
+            greetingTimer = window.setTimeout(function(){
+              greeting.textContent = '';
+            }, 2400);
+          }
+
           function saveName(){
             childName = document.getElementById('childName').value.trim().slice(0, 24);
             try {
               localStorage.setItem('multiplication-child-name', childName);
             } catch (error) {}
             updateGreeting();
+            showTemporaryGreeting();
             updateInsight();
           }
 
@@ -302,24 +319,20 @@
             if(lang === 'he'){
               insight.innerHTML =
                 '<div class="insight-line">' +
-                  '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
-                  '<span class="math">' + selectedB + '</span>' +
-                  '<span>' + escapeHtml(t.groupsWord) + '</span>' +
-                  '<span class="math">' + escapeHtml(parts.join(' + ')) + '</span>' +
+                  '<strong>' + escapeHtml(t.repeatedPrefix) + '</strong> ' +
+                  escapeHtml(isolateLtr(selectedB) + ' ' + t.groupsWord + ' ' + isolateLtr(parts.join(' + '))) +
                 '</div>' +
                 '<div class="insight-line">' +
-                  personalIntro +
-                  '<span>חוק החילוף מאפשר לנו להפוך את הגורמים ולקבל אותה תשובה:</span>' +
-                  '<span class="math">' + escapeHtml(mirror) + '</span>' +
+                  escapeHtml((name ? name + ', ' : '') + 'חוק החילוף מאפשר לנו להפוך את הגורמים ולקבל אותה תשובה: ' + isolateLtr(mirror)) +
                 '</div>' +
                 '<div class="insight-line">' +
-                  '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
-                  '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
+                  '<strong>' + escapeHtml(t.cluePrefix) + '</strong> ' +
+                  escapeHtml(clue(selectedA, selectedB)) +
                 '</div>';
             } else {
               insight.innerHTML =
                 '<div class="insight-line">' +
-                  '<span>' + escapeHtml(t.repeatedPrefix) + '</span>' +
+                  '<strong>' + escapeHtml(t.repeatedPrefix) + '</strong> ' +
                   '<span class="math">' + selectedB + '</span>' +
                   '<span>' + escapeHtml(t.groupsWord) + '</span>' +
                   '<span class="math">' + selectedA + '</span>' +
@@ -332,7 +345,7 @@
                   '<span class="math">' + escapeHtml(mirror) + '</span>' +
                 '</div>' +
                 '<div class="insight-line">' +
-                  '<span>' + escapeHtml(t.cluePrefix) + '</span>' +
+                  '<strong>' + escapeHtml(t.cluePrefix) + '</strong> ' +
                   '<span>' + escapeHtml(clue(selectedA, selectedB)) + '</span>' +
                 '</div>';
             }
