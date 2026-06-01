@@ -59,14 +59,6 @@
         .name-row button{min-height:44px;border:0;border-radius:8px;background:#087f8c;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
         .greeting{margin:0;color:#087f8c;font-size:20px;font-weight:900;line-height:1.4}
         .greeting:empty{display:none}
-        .multiples-panel{display:grid;gap:12px;justify-items:center;text-align:center}
-        .multiples-panel h2{margin:0;text-align:center;width:100%}
-        .multiples-picker{display:grid;grid-template-columns:repeat(5,50px);gap:8px;direction:ltr;justify-content:center}
-        .multiples-picker button{min-height:38px;border:1px solid #c9dbe8;border-radius:8px;background:white;color:#14324a;font-weight:900;cursor:pointer}
-        .multiples-picker button.selected{background:#14324a;color:white;border-color:#14324a}
-        .times-card{background:#dbe46b;border-radius:8px;padding:14px 18px;color:#111;direction:ltr;text-align:center;width:min(100%,230px)}
-        .times-card h3{margin:0 0 6px;font-size:22px;line-height:1.1}
-        .times-list{display:grid;gap:2px;font-size:20px;line-height:1.18;white-space:nowrap}
         .practice-panel{display:grid;gap:12px;justify-items:center;text-align:center}
         .practice-panel h2{margin:0;text-align:center;width:100%}
         .practice-picker{display:grid;grid-template-columns:repeat(5,50px);gap:8px;direction:ltr;justify-content:center}
@@ -74,11 +66,16 @@
         .practice-picker button.selected,.practice-mode button.selected{background:#14324a;color:white;border-color:#14324a}
         .practice-mode{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
         .practice-mode button{padding:8px 12px}
-        .practice-card{background:#fff;border:1px solid #c9dbe8;border-radius:8px;padding:14px 18px;color:#111;width:min(100%,260px)}
+        .practice-card{background:#fff;border:1px solid #c9dbe8;border-radius:8px;padding:14px 18px;color:#111;width:100%}
         .practice-card h3{margin:0 0 10px;font-size:20px;line-height:1.2}
-        .practice-list{display:grid;gap:6px;direction:ltr;text-align:left;font-size:18px;line-height:1.2}
-        .practice-item{display:flex;justify-content:space-between;gap:14px;border-bottom:1px dashed #c9dbe8;padding-bottom:4px}
+        .practice-list{display:grid;gap:8px;direction:ltr;text-align:left;font-size:18px;line-height:1.2}
+        .practice-item{display:grid;grid-template-columns:minmax(86px,1fr) 72px 38px 28px;align-items:center;gap:8px;border-bottom:1px dashed #c9dbe8;padding-bottom:6px}
         .practice-item:last-child{border-bottom:0;padding-bottom:0}
+        .practice-answer{width:72px;min-height:36px;border:1px solid #c9dbe8;border-radius:8px;padding:6px 8px;text-align:center;font:inherit;font-weight:800;color:#14324a}
+        .practice-check{min-width:38px;min-height:36px;border:0;border-radius:8px;background:#087f8c;color:white;font-size:18px;font-weight:900;cursor:pointer}
+        .practice-result{font-size:24px;font-weight:900;line-height:1;text-align:center}
+        .practice-result.correct{color:#1b8a4a}
+        .practice-result.wrong{color:#c94736}
         h2{margin:0 0 12px}
         bdi{unicode-bidi:isolate}
         @media(max-width:850px){
@@ -99,7 +96,7 @@
           .hero{display:block;text-align:center;margin:0 0 8mm}
           .hero h1{font-size:26pt;line-height:1.1;margin:0}
           .hero p{display:none}
-          .actions,.name-card,.multiples-panel,.practice-panel{display:none!important}
+          .actions,.name-card,.practice-panel{display:none!important}
           .layout{display:block}
           .panel{box-shadow:none;border:0;padding:0;background:white}
           .table-panel{break-inside:avoid;page-break-inside:avoid}
@@ -156,15 +153,6 @@
                 <div class="insight-lines" id="insight"></div>
               </aside>
 
-              <section class="panel multiples-panel" aria-labelledby="multiplesTitle">
-                <h2 id="multiplesTitle">כפולות</h2>
-                <div class="multiples-picker" id="multiplesPicker"></div>
-                <article class="times-card">
-                  <h3 id="timesTitle"></h3>
-                  <div class="times-list" id="timesList"></div>
-                </article>
-              </section>
-
               <section class="panel practice-panel" aria-labelledby="practiceTitle">
                 <h2 id="practiceTitle">תרגול</h2>
                 <div class="practice-picker" id="practicePicker"></div>
@@ -186,7 +174,6 @@
           var lang = 'he';
           var selectedA = 3;
           var selectedB = 4;
-          var selectedMultiple = 1;
           var selectedPractice = 1;
           var practiceMode = 'ordered';
           var table = document.getElementById('table');
@@ -211,12 +198,14 @@
               saveName: 'שמירה',
               greeting: 'שלום {name}!',
               noNameGreeting: 'שלום!',
-              multiplesTitle: 'כפולות',
-              timesTitle: 'כפולות של {n}',
               practiceTitle: 'תרגול',
               practiceCardTitle: 'תרגול כפולות של {n}',
               ordered: 'לפי סדר',
               mixed: 'מעורבב',
+              checkAnswer: 'בדיקה',
+              answerLabel: 'תשובה',
+              correct: 'נכון',
+              wrong: 'לא נכון',
               ariaTable: 'לוח הכפל',
               times: 'כפול',
               equals: 'שווה',
@@ -245,12 +234,14 @@
               saveName: 'Save',
               greeting: 'Hello {name}!',
               noNameGreeting: 'Hello!',
-              multiplesTitle: 'Multiples',
-              timesTitle: '{n} times table',
               practiceTitle: 'Practice',
               practiceCardTitle: 'Practice {n} times table',
               ordered: 'In order',
               mixed: 'Mixed',
+              checkAnswer: 'Check',
+              answerLabel: 'Answer',
+              correct: 'Correct',
+              wrong: 'Try again',
               ariaTable: 'Multiplication table',
               times: 'times',
               equals: 'equals',
@@ -307,7 +298,6 @@
             document.getElementById('nameLabel').textContent = t.nameLabel;
             document.getElementById('childName').placeholder = t.namePlaceholder;
             document.getElementById('saveNameButton').textContent = t.saveName;
-            document.getElementById('multiplesTitle').textContent = t.multiplesTitle;
             document.getElementById('practiceTitle').textContent = t.practiceTitle;
             document.getElementById('orderedMode').textContent = t.ordered;
             document.getElementById('mixedMode').textContent = t.mixed;
@@ -315,7 +305,6 @@
             updateGreeting();
             draw();
             updateInsight();
-            drawMultiples();
             drawPractice();
           }
 
@@ -402,37 +391,6 @@
             }
           }
 
-          function drawMultiples(){
-            var t = strings[lang];
-            var picker = document.getElementById('multiplesPicker');
-            var title = document.getElementById('timesTitle');
-            var list = document.getElementById('timesList');
-            picker.innerHTML = '';
-
-            for(var factor=1;factor<=10;factor++){
-              var button = document.createElement('button');
-              button.type = 'button';
-              button.textContent = factor;
-              button.className = factor === selectedMultiple ? 'selected' : '';
-              button.setAttribute('aria-pressed', factor === selectedMultiple ? 'true' : 'false');
-              button.onclick = (function(value){
-                return function(){
-                  selectedMultiple = value;
-                  drawMultiples();
-                };
-              })(factor);
-              picker.appendChild(button);
-            }
-
-            title.textContent = t.timesTitle.replace('{n}', selectedMultiple);
-            list.innerHTML = '';
-            for(var multiplier=1;multiplier<=10;multiplier++){
-              var line = document.createElement('div');
-              line.textContent = selectedMultiple + ' x ' + multiplier + ' = ' + (selectedMultiple * multiplier);
-              list.appendChild(line);
-            }
-          }
-
           function practiceNumbers(){
             var ordered = [1,2,3,4,5,6,7,8,9,10];
             if(practiceMode === 'ordered') return ordered;
@@ -480,8 +438,28 @@
             list.innerHTML = '';
             practiceNumbers().forEach(function(multiplier){
               var line = document.createElement('div');
+              var answer = selectedPractice * multiplier;
+              var inputId = 'practice-' + selectedPractice + '-' + multiplier;
               line.className = 'practice-item';
-              line.innerHTML = '<span>' + selectedPractice + ' x ' + multiplier + '</span><strong>= ___</strong>';
+              line.innerHTML =
+                '<label for="' + inputId + '">' + selectedPractice + ' x ' + multiplier + ' =</label>' +
+                '<input class="practice-answer" id="' + inputId + '" type="number" inputmode="numeric" aria-label="' + escapeHtml(t.answerLabel + ': ' + selectedPractice + ' x ' + multiplier) + '" />' +
+                '<button class="practice-check" type="button" aria-label="' + escapeHtml(t.checkAnswer + ': ' + selectedPractice + ' x ' + multiplier) + '">✓</button>' +
+                '<span class="practice-result" aria-live="polite"></span>';
+              var input = line.querySelector('.practice-answer');
+              var checkButton = line.querySelector('.practice-check');
+              var result = line.querySelector('.practice-result');
+              function check(){
+                var value = Number(input.value);
+                var isCorrect = input.value.trim() !== '' && value === answer;
+                result.textContent = isCorrect ? '✓' : '✕';
+                result.className = 'practice-result ' + (isCorrect ? 'correct' : 'wrong');
+                result.setAttribute('aria-label', isCorrect ? t.correct : t.wrong);
+              }
+              checkButton.onclick = check;
+              input.onkeydown = function(event){
+                if(event.key === 'Enter') check();
+              };
               list.appendChild(line);
             });
           }
