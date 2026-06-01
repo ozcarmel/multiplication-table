@@ -11,14 +11,115 @@
   </head>
   <body>
     <div id="root">
-      <main style="min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Arial,sans-serif;color:#14324a;background:#f6fbff" dir="rtl" lang="he">
-        <section style="max-width:520px;padding:24px;border:1px solid #c9dbe8;border-radius:8px;background:white">
-          <p style="margin:0 0 8px;color:#087f8c;font-weight:700">לוח הכפל</p>
-          <h1 style="margin:0 0 12px">טוען את הלוח...</h1>
-          <p style="margin:0;color:#53677a;line-height:1.6">אם המסך נשאר כך, רעננו את הדף.</p>
+      <main class="static-app" dir="rtl" lang="he">
+        <style>
+          .static-app{min-height:100vh;padding:24px;font-family:Arial,sans-serif;color:#14324a;background:#f6fbff}
+          .static-shell{max-width:1180px;margin:0 auto;display:grid;gap:18px}
+          .static-hero{display:flex;align-items:end;justify-content:space-between;gap:16px}
+          .static-hero h1{margin:0;font-size:48px;line-height:1}
+          .static-hero p{margin:10px 0 0;color:#53677a;font-size:18px}
+          .static-panel{background:white;border:1px solid #c9dbe8;border-radius:8px;padding:18px;box-shadow:0 18px 45px rgba(20,50,74,.12)}
+          .static-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px}
+          .static-table-wrap{direction:ltr;overflow:auto}
+          .static-table{display:grid;grid-template-columns:repeat(11,56px);gap:5px;min-width:670px}
+          .static-cell,.static-axis,.static-corner{min-height:48px;border-radius:7px;display:grid;place-items:center;font-weight:800}
+          .static-axis,.static-corner{background:#14324a;color:white}
+          .static-cell{border:1px solid #d4e2ec;background:white;color:#14324a;cursor:pointer}
+          .static-cell:hover,.static-cell.active{background:#d9f3f0;border-color:#087f8c}
+          .static-cell.selected{background:#ff6b5a;color:white;border-color:#c94736}
+          .static-cell.mirror{background:#fff3ba;border-color:#d7ae2f}
+          .static-insight{display:grid;gap:12px;align-content:start}
+          .static-equation{direction:ltr;display:flex;flex-wrap:wrap;gap:8px;font-size:34px;font-weight:900}
+          .static-equation span{min-width:46px;min-height:46px;display:grid;place-items:center;border-radius:8px;background:#d9f3f0}
+          .static-equation strong{min-width:54px;min-height:46px;display:grid;place-items:center;border-radius:8px;background:#f6c945}
+          .static-note{line-height:1.55;color:#53677a}
+          .static-actions{display:flex;gap:10px;flex-wrap:wrap}
+          .static-actions button{min-height:44px;border:0;border-radius:8px;background:#14324a;color:white;padding:10px 14px;font-weight:800;cursor:pointer}
+          @media(max-width:850px){.static-app{padding:16px}.static-hero{display:block}.static-hero h1{font-size:38px}.static-layout{grid-template-columns:1fr}.static-table{grid-template-columns:repeat(11,46px);min-width:560px}.static-panel{padding:14px}}
+        </style>
+        <section class="static-shell">
+          <header class="static-hero">
+            <div>
+              <h1>לוח הכפל החי</h1>
+              <p>לוח 10x10 אינטראקטיבי בעברית. לחצו על תא כדי לראות תבנית והסבר.</p>
+            </div>
+            <div class="static-actions">
+              <button type="button" onclick="window.print()">הדפסה</button>
+              <button type="button" onclick="document.documentElement.lang='en';document.documentElement.dir='ltr';document.querySelector('.static-app').dir='ltr'">English</button>
+            </div>
+          </header>
+          <section class="static-layout">
+            <div class="static-panel">
+              <h2 style="margin:0 0 12px">לוח 10x10 אינטראקטיבי</h2>
+              <div class="static-table-wrap">
+                <div class="static-table" id="staticTable" aria-label="לוח הכפל"></div>
+              </div>
+            </div>
+            <aside class="static-panel static-insight" aria-live="polite">
+              <div class="static-equation" id="staticEquation">
+                <span>3</span><span>×</span><span>4</span><span>=</span><strong>12</strong>
+              </div>
+              <p class="static-note" id="staticInsight">3 + 3 + 3 + 3 = 12. אפשר להפוך את הגורמים ולקבל אותה תשובה: 4 × 3 = 12.</p>
+              <p class="static-note">אם אתם רואים את המסך הזה, האפליקציה נטענה במצב בטוח שמתאים לדפדפן הפנימי.</p>
+            </aside>
+          </section>
         </section>
+        <script>
+          (function(){
+            var table=document.getElementById('staticTable');
+            if(!table)return;
+            var selectedA=3,selectedB=4;
+            function clue(a,b){
+              if(a===b)return 'זה מספר ריבועי: שני הגורמים שווים.';
+              if(a===10||b===10)return 'כפולות של 10 מוסיפות אפס.';
+              if(a===5||b===5)return 'כפולות של 5 מסתיימות ב-0 או 5.';
+              if(a===9||b===9)return 'בכפולות של 9 יש תבנית ספרות יפה.';
+              if(a===2||b===2)return 'כפול 2 הוא זוגות.';
+              return 'אפשר להפוך את הגורמים ולקבל אותה תשובה.';
+            }
+            function draw(){
+              table.innerHTML='';
+              var corner=document.createElement('div');
+              corner.className='static-corner';
+              corner.textContent='×';
+              table.appendChild(corner);
+              for(var h=1;h<=10;h++){
+                var head=document.createElement('div');
+                head.className='static-axis';
+                head.textContent=h;
+                table.appendChild(head);
+              }
+              for(var a=1;a<=10;a++){
+                var axis=document.createElement('div');
+                axis.className='static-axis';
+                axis.textContent=a;
+                table.appendChild(axis);
+                for(var b=1;b<=10;b++){
+                  var button=document.createElement('button');
+                  button.type='button';
+                  button.className='static-cell';
+                  if(a===selectedA&&b===selectedB)button.className+=' selected';
+                  else if(a===selectedB&&b===selectedA)button.className+=' mirror';
+                  else if(a===selectedA||b===selectedB)button.className+=' active';
+                  button.textContent=a*b;
+                  button.setAttribute('aria-label',a+' כפול '+b+' שווה '+(a*b));
+                  button.onclick=(function(row,col){return function(){selectedA=row;selectedB=col;update();};})(a,b);
+                  table.appendChild(button);
+                }
+              }
+            }
+            function update(){
+              var product=selectedA*selectedB;
+              document.getElementById('staticEquation').innerHTML='<span>'+selectedA+'</span><span>×</span><span>'+selectedB+'</span><span>=</span><strong>'+product+'</strong>';
+              var parts=[];
+              for(var i=0;i<selectedB;i++)parts.push(selectedA);
+              document.getElementById('staticInsight').textContent=parts.join(' + ')+' = '+product+'. '+selectedB+' × '+selectedA+' = '+product+'. '+clue(selectedA,selectedB);
+              draw();
+            }
+            update();
+          })();
+        </script>
       </main>
     </div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
