@@ -83,7 +83,9 @@
           .hero{display:block}
           .hero h1{font-size:38px}
           .actions{margin-top:14px}
-          .layout{grid-template-columns:1fr;grid-template-areas:"table" "insight"}
+          .layout,
+          .app[dir="rtl"] .layout,
+          .app[dir="ltr"] .layout{grid-template-columns:minmax(0,1fr);grid-template-areas:"table" "insight"}
           .table{grid-template-columns:repeat(11,46px);min-width:560px}
           .panel{padding:14px}
         }

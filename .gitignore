@@ -2,4 +2,6 @@ node_modules/
 dist/
 *.tsbuildinfo
 verification-*.png
+mobile-*.png
+pics/
 .DS_Store
