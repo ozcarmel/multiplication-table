@@ -97,6 +97,12 @@
           .hero p{font-size:16px;line-height:1.45}
           .actions{justify-content:center}
           .app[dir="rtl"] .actions{justify-content:center}
+          .layout,
+          .app[dir="rtl"] .layout,
+          .app[dir="ltr"] .layout{grid-template-areas:"practice" "table" "insight"}
+          .side-stack{display:contents}
+          .side-stack .insight{grid-area:insight}
+          .practice-panel{grid-area:practice}
           .table-panel{padding:10px}
           .table-wrap{overflow:visible}
           .table{width:100%;min-width:0;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px}
@@ -228,6 +234,7 @@
               language: 'עברית',
               noNameGreeting: 'Hello!',
               practiceTitle: 'Practice',
+              mobilePracticeTitle: 'Practice Multiplication',
               practiceCardTitle: 'Practice {n} times table',
               ordered: 'In order',
               mixed: 'Mixed',
@@ -289,7 +296,7 @@
             document.getElementById('subtitle').textContent = t.subtitle;
             document.getElementById('printButton').textContent = t.print;
             document.getElementById('languageButton').textContent = t.language;
-            document.getElementById('practiceTitle').textContent = t.practiceTitle;
+            updatePracticeTitle();
             document.getElementById('orderedMode').textContent = t.ordered;
             document.getElementById('mixedMode').textContent = t.mixed;
             document.getElementById('revealPracticeButton').textContent = t.reveal;
@@ -298,6 +305,12 @@
             draw();
             updateInsight();
             drawPractice();
+          }
+
+          function updatePracticeTitle(){
+            var t = strings[lang];
+            var isPhone = window.matchMedia('(max-width: 480px)').matches;
+            document.getElementById('practiceTitle').textContent = isPhone ? (t.mobilePracticeTitle || t.practiceTitle) : t.practiceTitle;
           }
 
           function draw(){
@@ -516,6 +529,7 @@
             lang = lang === 'he' ? 'en' : 'he';
             applyLanguage();
           };
+          window.addEventListener('resize', updatePracticeTitle);
 
           applyLanguage();
         })();
