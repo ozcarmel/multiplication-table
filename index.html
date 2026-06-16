@@ -89,6 +89,19 @@
           .table{grid-template-columns:repeat(11,46px);min-width:560px}
           .panel{padding:14px}
         }
+        @media(max-width:480px){
+          .app{padding:12px}
+          .shell{gap:14px}
+          .hero{text-align:center}
+          .hero h1{font-size:34px;line-height:1.08}
+          .hero p{font-size:16px;line-height:1.45}
+          .actions{justify-content:center}
+          .app[dir="rtl"] .actions{justify-content:center}
+          .table-panel{padding:10px}
+          .table-wrap{overflow:visible}
+          .table{width:100%;min-width:0;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px}
+          .cell,.axis,.corner{min-height:38px;border-radius:6px;font-size:14px}
+        }
         @media print{
           @page{size:A4 portrait;margin:10mm}
           *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
